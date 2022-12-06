@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,6 +40,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
   String adminPass = '';
   String _foto = '';
   PickedFile? foto;
+  String? mtoken = "";
   String fotoLocal =
       'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975';
   //
@@ -242,6 +244,14 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                             ),
                                           ),
                                           onPressed: () async {
+                                            await FirebaseMessaging.instance
+                                                .getToken()
+                                                .then((token) {
+                                              setState(() {
+                                                mtoken = token;
+                                                print('my token is $mtoken');
+                                              });
+                                            });
                                             if (FirebaseAuth.instance
                                                     .currentUser?.uid ==
                                                 null) {
@@ -307,6 +317,17 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'pontos': '0',
                                                     'dtcadastro':
                                                         Timestamp.now(),
+                                                  });
+
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Usuarios')
+                                                      .doc(FirebaseAuth.instance
+                                                          .currentUser!.uid)
+                                                      .collection('Criancas')
+                                                      .doc(uid)
+                                                      .update({
+                                                    'token': mtoken,
                                                   });
                                                   ScaffoldMessenger.of(context)
                                                       .clearSnackBars();
@@ -426,6 +447,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'nivel': widget.tipo,
                                                     'foto': fotoLocal,
                                                     'pontos': '0',
+                                                    'tokenRes': mtoken,
                                                     'dtcadastro':
                                                         Timestamp.now(),
                                                   });
@@ -519,6 +541,13 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
   }
 
   void getEmailAdmin() async {
+    DocumentSnapshot tokenRes = await FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    setState(() {
+      mtoken = tokenRes['token'];
+    });
     if (FirebaseAuth.instance.currentUser?.uid != null) {
       var mail = await refUser
           .doc(FirebaseAuth.instance.currentUser?.uid)

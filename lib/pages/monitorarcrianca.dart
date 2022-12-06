@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:meudentinho/pages/criarmetas.dart';
 import 'package:meudentinho/pages/definirescovacao.dart';
 import 'package:meudentinho/pages/editarcrianca.dart';
 
@@ -28,9 +30,27 @@ class _EditarCriancaState extends State<EditarCrianca> {
     getData();
   }
 
+  String feita1 = 'não';
+  String time1 = '00:00';
+  String feita2 = 'não';
+  String time2 = '00:00';
+  String feita3 = 'não';
+  String time3 = '00:00';
+  String datainicio = '';
+  String datatermino = '';
+  String premio = '';
+  String pontosatuais = '';
+  String pontosdesejados = '';
+  String status = '';
+  double porcentagem = 0;
   Widget build(BuildContext context) {
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
+    CollectionReference historico = FirebaseFirestore.instance
+        .collection('Historico')
+        .doc(widget.uid)
+        .collection('Historico');
+    int qtd = 0;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: background,
@@ -155,7 +175,11 @@ class _EditarCriancaState extends State<EditarCrianca> {
                             ),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  CriarMetas(uid: widget.uid)));
+                        },
                         child: Text(
                           'Criar Meta',
                           style: TextStyle(color: Colors.white, fontSize: 16),
@@ -209,7 +233,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: backVerde,
+                              color: feita1 == 'sim' ? backVerde : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -217,13 +241,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               Text(
                                 '1º Escovação',
                                 style: TextStyle(
-                                    color: Colors.blue,
+                                    color: feita1 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                '07:00',
+                                time1,
                                 style: TextStyle(
-                                    color: Colors.blue,
+                                    color: feita1 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -234,8 +262,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  Icons.done,
-                                  color: Colors.green,
+                                  feita1 == 'sim' ? Icons.done : Icons.close,
+                                  color: feita1 == 'sim'
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
                               ),
                             ],
@@ -245,7 +275,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: feita2 == 'sim' ? backVerde : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -253,13 +283,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               Text(
                                 '2º Escovação',
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: feita2 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                '12:00',
+                                time2,
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: feita2 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -270,8 +304,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
+                                  feita2 == 'sim' ? Icons.done : Icons.close,
+                                  color: feita2 == 'sim'
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
                               ),
                             ],
@@ -281,7 +317,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: feita3 == 'sim' ? backVerde : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,13 +325,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               Text(
                                 '3º Escovação',
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: feita3 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                '20:00',
+                                time3,
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: feita3 == 'sim'
+                                        ? Colors.blue
+                                        : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -306,8 +346,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
+                                  feita3 == 'sim' ? Icons.done : Icons.close,
+                                  color: feita3 == 'sim'
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
                               ),
                             ],
@@ -346,7 +388,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          '01/11/2022 - 01/12/2022',
+                          '$datainicio - $datatermino',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -354,7 +396,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               color: Colors.white),
                         ),
                         Text(
-                          'Prêmio: Nintendo Switch',
+                          'Prêmio: $premio',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -388,14 +430,14 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                         fontWeight: FontWeight.w300),
                                   ),
                                   Text(
-                                    '15',
+                                    pontosatuais,
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w800),
                                   ),
                                   Text(
-                                    'de 90',
+                                    pontosdesejados,
                                     style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white,
@@ -432,14 +474,14 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                         fontWeight: FontWeight.w300),
                                   ),
                                   Text(
-                                    '15',
+                                    pontosatuais,
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w800),
                                   ),
                                   Text(
-                                    'de 90',
+                                    pontosdesejados,
                                     style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white,
@@ -461,7 +503,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '16.66%',
+                              '${porcentagem * 100}%',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600),
@@ -482,7 +524,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                             ),
                             Container(
                               height: 10,
-                              width: tamanhobarra * 0.1666,
+                              width: tamanhobarra * porcentagem,
                               decoration: BoxDecoration(
                                 color: secondary,
                                 borderRadius: BorderRadius.circular(20),
@@ -561,11 +603,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
                         Container(),
                         Container(),
                         Text(
-                          'Minha Escovação',
+                          'Status da Escovação:',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w700),
                         ),
-                        Container(),
                       ],
                     ),
 
@@ -573,99 +614,171 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       height: Get.size.height * 0.38,
                       width: Get.size.width,
                       child: Expanded(
-                        child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            itemCount: 15,
-                            itemBuilder: (context, index) {
-                              return //Segunda
-                                  Container(
-                                margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: tamanhobarra * 0.5,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            '03/12/2022',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500),
+                        child: StreamBuilder(
+                          stream: historico.snapshots(),
+                          builder:
+                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasData) {
+                              return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  child: ListView.builder(
+                                      physics: BouncingScrollPhysics(),
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        final DocumentSnapshot
+                                            documentSnapshot =
+                                            snapshot.data!.docs[index];
+                                        if (documentSnapshot['time1'] ==
+                                            'sim') {
+                                          print('time1 ok');
+                                          qtd++;
+                                        }
+                                        if (documentSnapshot['time2'] ==
+                                            'sim') {
+                                          print('time2 ok');
+                                          qtd++;
+                                        }
+                                        if (documentSnapshot['time3'] ==
+                                            'sim') {
+                                          print('time3 ok');
+                                          qtd++;
+                                        }
+                                        return Container(
+                                          margin:
+                                              EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                width: tamanhobarra * 0.5,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      documentSnapshot['data'],
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                    //Quantidade de Escovações
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        documentSnapshot['qtd'],
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              //Status
+                                              Container(
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              5, 0, 0, 0),
+                                                      height: 24,
+                                                      width: 24,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                      ),
+                                                      child: Icon(
+                                                        documentSnapshot[
+                                                                    'time1'] ==
+                                                                'sim'
+                                                            ? Icons.done
+                                                            : Icons.close,
+                                                        color: documentSnapshot[
+                                                                    'time1'] ==
+                                                                'sim'
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              5, 0, 0, 0),
+                                                      height: 24,
+                                                      width: 24,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                      ),
+                                                      child: Icon(
+                                                        documentSnapshot[
+                                                                    'time2'] ==
+                                                                'sim'
+                                                            ? Icons.done
+                                                            : Icons.close,
+                                                        color: documentSnapshot[
+                                                                    'time2'] ==
+                                                                'sim'
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              5, 0, 0, 0),
+                                                      height: 24,
+                                                      width: 24,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                      ),
+                                                      child: Icon(
+                                                        documentSnapshot[
+                                                                    'time3'] ==
+                                                                'sim'
+                                                            ? Icons.done
+                                                            : Icons.close,
+                                                        color: documentSnapshot[
+                                                                    'time3'] ==
+                                                                'sim'
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                          //Quantidade de Escovações
-                                          Align(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '1',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    //Status
-                                    Container(
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            margin:
-                                                EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                            height: 24,
-                                            width: 24,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                            child: Icon(
-                                              Icons.done,
-                                              color: Colors.green,
-                                            ),
-                                          ),
-                                          Container(
-                                            margin:
-                                                EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                            height: 24,
-                                            width: 24,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                            child: Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                          Container(
-                                            margin:
-                                                EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                            height: 24,
-                                            width: 24,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                            child: Icon(
-                                              Icons.close,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                        );
+                                      }));
+                            } else if (snapshot.hasError) {
+                              print('erro: ${snapshot.error.toString()}');
+                              return Center(
+                                child:
+                                    Text('error: ${snapshot.error.toString()}'),
                               );
-                            }),
+                            }
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -689,6 +802,49 @@ class _EditarCriancaState extends State<EditarCrianca> {
       nome = docRef['nome'];
       fotoLocal = docRef['foto'];
       pontos = docRef['pontos'];
+    });
+
+    //
+    //
+    final CollectionReference escovacao = FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(widget.uid)
+        .collection('Escovacao');
+    var esc1 = escovacao.doc('1').get().then((value) {
+      setState(() {
+        feita1 = value['feita'];
+        time1 = value['hora'];
+      });
+    });
+    var esc2 = escovacao.doc('2').get().then((value) {
+      setState(() {
+        feita2 = value['feita'];
+        time2 = value['hora'];
+      });
+    });
+    var esc3 = escovacao.doc('3').get().then((value) {
+      setState(() {
+        feita3 = value['feita'];
+        time3 = value['hora'];
+      });
+    });
+    DocumentReference meta = await FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(widget.uid)
+        .collection('Meta')
+        .doc('Meta');
+    meta.get().then((value) {
+      setState(() {
+        datainicio = value['datainicio'];
+        datatermino = value['datatermino'];
+        premio = value['premio'];
+        pontosatuais = value['pontosatuais'];
+        pontosdesejados = value['pontosdesejados'];
+        status = value['status'];
+        var num = (int.parse(pontosatuais) / int.parse(pontosdesejados)) * 100;
+        porcentagem = num / 100;
+        print(porcentagem);
+      });
     });
   }
 }

@@ -36,6 +36,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
   String adminPass = '';
   String _foto = '';
   PickedFile? foto;
+  String mtoken = '';
   String fotoLocal =
       'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975';
   //
@@ -281,7 +282,9 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                                   'parentesco':
                                                       parentescoControl.text,
                                                   'foto': fotoLocal,
+                                                  'tokenRes': mtoken,
                                                 });
+
                                                 ScaffoldMessenger.of(context)
                                                     .clearSnackBars();
                                                 ScaffoldMessenger.of(context)
@@ -333,7 +336,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                             }
                                           },
                                           child: Text(
-                                            'Cadastrar usuário',
+                                            'Atualizar Dados',
                                             style: TextStyle(
                                               fontSize: 18,
                                             ),
@@ -377,6 +380,13 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
   }
 
   void getData() async {
+    DocumentSnapshot tokenRes = await FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    setState(() {
+      mtoken = tokenRes['token'];
+    });
     DocumentSnapshot docRef = await FirebaseFirestore.instance
         .collection('Usuarios')
         .doc(widget.uid)
@@ -388,6 +398,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
       idadeControl.text = docRef['idade'];
       cpfControl.text = docRef['cpf'];
       parentescoControl.text = docRef['parentesco'];
+      fotoLocal = docRef['foto'];
     });
   }
 }

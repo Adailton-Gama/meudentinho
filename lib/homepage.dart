@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:meudentinho/config.dart';
 import 'package:meudentinho/pages/especialistas.dart';
 import 'package:meudentinho/pages/metadiaria.dart';
@@ -30,17 +33,42 @@ class _HomePageState extends State<HomePage> {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   @override
+  String nome = '';
+  String _foto = '';
+
+  String fotoLocal = '';
+  String pontos = '';
   void initState() {
     // TODO: implement initState
     super.initState();
     requestPermission();
     initInfo();
+    getData();
   }
 
+  String feita1 = 'não';
+  String time1 = '00:00';
+  String feita2 = 'não';
+  String time2 = '00:00';
+  String feita3 = 'não';
+  String time3 = '00:00';
+  String datainicio = '';
+  String datatermino = '';
+  String premio = '';
+  String pontosatuais = '';
+  String pontosdesejados = '';
+  String status = '';
+  double porcentagem = 0;
+
+  var dia;
   @override
   Widget build(BuildContext context) {
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
+    CollectionReference historico = FirebaseFirestore.instance
+        .collection('Historico')
+        .doc(widget.uid)
+        .collection('Historico');
     return Scaffold(
       key: _key,
       drawer: Drawer(
@@ -99,52 +127,52 @@ class _HomePageState extends State<HomePage> {
                                     )),
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => MinhaEscovacao()),
-                                    (route) => false);
-                              },
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: gradient,
-                                ),
-                                child: Text('Minha Escovação',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    )),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => MetaDiaria()),
-                                    (route) => false);
-                              },
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: gradient,
-                                ),
-                                child: Text('Meta Diária',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    )),
-                              ),
-                            ),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     Navigator.of(context).pushAndRemoveUntil(
+                            //         MaterialPageRoute(
+                            //             builder: (context) => MinhaEscovacao()),
+                            //         (route) => false);
+                            //   },
+                            //   child: Container(
+                            //     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            //     padding: EdgeInsets.all(10),
+                            //     decoration: BoxDecoration(
+                            //       borderRadius: BorderRadius.circular(20),
+                            //       gradient: gradient,
+                            //     ),
+                            //     child: Text('Minha Escovação',
+                            //         textAlign: TextAlign.center,
+                            //         style: TextStyle(
+                            //           fontSize: 16,
+                            //           fontWeight: FontWeight.w800,
+                            //           color: Colors.white,
+                            //         )),
+                            //   ),
+                            // ),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     Navigator.of(context).pushAndRemoveUntil(
+                            //         MaterialPageRoute(
+                            //             builder: (context) => MetaDiaria()),
+                            //         (route) => false);
+                            //   },
+                            //   child: Container(
+                            //     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            //     padding: EdgeInsets.all(10),
+                            //     decoration: BoxDecoration(
+                            //       borderRadius: BorderRadius.circular(20),
+                            //       gradient: gradient,
+                            //     ),
+                            //     child: Text('Meta Diária',
+                            //         textAlign: TextAlign.center,
+                            //         style: TextStyle(
+                            //           fontSize: 16,
+                            //           fontWeight: FontWeight.w800,
+                            //           color: Colors.white,
+                            //         )),
+                            //   ),
+                            // ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
@@ -327,15 +355,16 @@ class _HomePageState extends State<HomePage> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(100),
                                   image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/fotoperfil.png'))),
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(fotoLocal))),
                             ),
                             Container(
                               padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Adailton Gama',
+                                    nome,
                                     style: TextStyle(
                                       color: Colors.white,
                                     ),
@@ -344,13 +373,18 @@ class _HomePageState extends State<HomePage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      SizedBox(width: 5),
                                       Icon(
-                                        Icons.wb_sunny,
-                                        color: Colors.yellow[700],
+                                        dia == 'sol'
+                                            ? Icons.wb_sunny
+                                            : Icons.dark_mode_rounded,
+                                        color: dia == 'sol'
+                                            ? Colors.yellow[700]
+                                            : Colors.grey[700],
                                         size: 20,
                                       ),
                                       Text(
-                                        'Hoje - 07:45',
+                                        ' ${DateFormat('dd/MM/yyyy - HH:mm').format(DateTime.now())}',
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),
@@ -412,7 +446,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Container(
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                // margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                margin: EdgeInsets.fromLTRB(20, 10, 10, 0),
                 height: 50,
                 width: Get.size.width,
                 decoration:
@@ -423,804 +457,583 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       //Escovação do Dia
                       Container(
-                        margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        decoration: BoxDecoration(
-                          color: background,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [shadow],
-                        ),
-                        width: cardWidth,
                         padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              'Escovação do Dia',
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  color: backVerde,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '1º Escovação',
-                                    style: TextStyle(
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.w700),
+                        // margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                        width: Get.size.width,
+                        decoration: BoxDecoration(
+                          color: titulo,
+                          boxShadow: [
+                            BoxShadow(
+                              color: shadowColor,
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            )
+                          ],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Escovação do Dia',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                color: feita1 == 'sim' ? backVerde : Colors.red,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '1º Escovação',
+                                  style: TextStyle(
+                                      color: feita1 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  time1,
+                                  style: TextStyle(
+                                      color: feita1 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Container(
+                                  height: 24,
+                                  width: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
                                   ),
-                                  Text(
-                                    '07:00',
-                                    style: TextStyle(
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.w700),
+                                  child: Icon(
+                                    feita1 == 'sim' ? Icons.done : Icons.close,
+                                    color: feita1 == 'sim'
+                                        ? Colors.green
+                                        : Colors.red,
                                   ),
-                                  Container(
-                                    height: 24,
-                                    width: 24,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.done,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '2º Escovação',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '12:00',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Container(
-                                    height: 24,
-                                    width: 24,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '3º Escovação',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Text(
-                                    '20:00',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Container(
-                                    height: 24,
-                                    width: 24,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  primary: secondary, onPrimary: backVerde),
-                              onPressed: () async {
-                                String time =
-                                    '${DateTime.now().hour}:${DateTime.now().minute}';
-                                String nome = 'Adailton';
-                                String title = 'Escovação do $nome';
-                                String body =
-                                    '$nome, fez a 1º Escovação do dia! às $time.';
-                                if (nome != "") {
-                                  DocumentSnapshot snap =
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: secondary, onPrimary: backVerde),
+                                  onPressed: () async {
+                                    final storage = FirebaseStorage.instance;
+
+                                    var ref = FirebaseFirestore.instance
+                                        .collection('Usuarios')
+                                        .doc(widget.uid);
+
+                                    PickedFile? fotoPerfil = await ImagePicker()
+                                        .getImage(source: ImageSource.gallery);
+                                    var file = File(fotoPerfil!.path);
+                                    var cadFoto = await storage
+                                        .ref()
+                                        .child(
+                                            'usuarios/${widget.uid}/foto/perfil/')
+                                        .putFile(file);
+                                    //
+                                    var imgUrl =
+                                        await cadFoto.ref.getDownloadURL();
+                                    //
+                                    ref.update({
+                                      'fotocrianca': imgUrl,
+                                    });
+                                    //
+                                    setState(() {
+                                      fotoLocal = imgUrl;
+                                    });
+                                    //
+                                    String time =
+                                        '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                    String title = 'Escovação do(a) $nome';
+                                    String body =
+                                        '$nome, fez a 1º Escovação do dia! às $time.';
+                                    if (nome != "") {
+                                      DocumentSnapshot snap =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                              .get();
+
+                                      var uidRes = snap['uidRes'];
+                                      DocumentSnapshot snapRes =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(uidRes)
+                                              .get();
+                                      String token = snapRes['token'];
+
+                                      print(token);
+                                      sendPushMessage(token, body, title);
                                       await FirebaseFirestore.instance
                                           .collection('Usuarios')
-                                          .doc(FirebaseAuth
-                                              .instance.currentUser!.uid)
-                                          .get();
-                                  String token = snap['token'];
-                                  print(token);
-                                  sendPushMessage(token, body, title);
-                                }
-                              },
-                              child: Text(
-                                'Enviar Escovação',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700),
-                              ),
+                                          .doc(widget.uid)
+                                          .collection('Escovacao')
+                                          .doc('1')
+                                          .update({'feita': 'sim'});
+                                      await FirebaseFirestore.instance
+                                          .collection('Historico')
+                                          .doc(widget.uid)
+                                          .collection('Historico')
+                                          .doc(DateFormat('ddMMyyyy')
+                                              .format(DateTime.now()))
+                                          .set({
+                                        'data': DateFormat('dd/MM/yyyy')
+                                            .format(DateTime.now()),
+                                        'qtd': '1',
+                                        'time1': 'sim',
+                                        'foto': fotoLocal,
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    'Enviar',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                color: feita2 == 'sim' ? backVerde : Colors.red,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '2º Escovação',
+                                  style: TextStyle(
+                                      color: feita2 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  time2,
+                                  style: TextStyle(
+                                      color: feita2 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Container(
+                                  height: 24,
+                                  width: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Icon(
+                                    feita2 == 'sim' ? Icons.done : Icons.close,
+                                    color: feita2 == 'sim'
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: secondary, onPrimary: backVerde),
+                                  onPressed: () async {
+                                    final storage = FirebaseStorage.instance;
+
+                                    var ref = FirebaseFirestore.instance
+                                        .collection('Usuarios')
+                                        .doc(widget.uid);
+
+                                    PickedFile? fotoPerfil = await ImagePicker()
+                                        .getImage(source: ImageSource.gallery);
+                                    var file = File(fotoPerfil!.path);
+                                    var cadFoto = await storage
+                                        .ref()
+                                        .child(
+                                            'usuarios/${widget.uid}/foto/perfil/')
+                                        .putFile(file);
+                                    //
+                                    var imgUrl =
+                                        await cadFoto.ref.getDownloadURL();
+                                    //
+                                    ref.update({
+                                      'fotocrianca': imgUrl,
+                                    });
+                                    //
+                                    setState(() {
+                                      fotoLocal = imgUrl;
+                                    });
+                                    //
+                                    String time =
+                                        '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                    String title = 'Escovação do(a) $nome';
+                                    String body =
+                                        '$nome, fez a 2º Escovação do dia! às $time.';
+                                    if (nome != "") {
+                                      DocumentSnapshot snap =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                              .get();
+
+                                      var uidRes = snap['uidRes'];
+                                      DocumentSnapshot snapRes =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(uidRes)
+                                              .get();
+                                      String token = snapRes['token'];
+
+                                      print(token);
+                                      sendPushMessage(token, body, title);
+                                      await FirebaseFirestore.instance
+                                          .collection('Usuarios')
+                                          .doc(widget.uid)
+                                          .collection('Escovacao')
+                                          .doc('2')
+                                          .update({'feita': 'sim'});
+                                      await FirebaseFirestore.instance
+                                          .collection('Historico')
+                                          .doc(widget.uid)
+                                          .collection('Historico')
+                                          .doc(DateFormat('ddMMyyyy')
+                                              .format(DateTime.now()))
+                                          .set({
+                                        'data': DateFormat('dd/MM/yyyy')
+                                            .format(DateTime.now()),
+                                        'qtd': '2',
+                                        'time1': 'sim',
+                                        'time2': 'sim',
+                                        'foto': fotoLocal,
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    'Enviar',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                color: feita3 == 'sim' ? backVerde : Colors.red,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '3º Escovação',
+                                  style: TextStyle(
+                                      color: feita3 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  time3,
+                                  style: TextStyle(
+                                      color: feita3 == 'sim'
+                                          ? Colors.blue
+                                          : Colors.white,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Container(
+                                  height: 24,
+                                  width: 24,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Icon(
+                                    feita3 == 'sim' ? Icons.done : Icons.close,
+                                    color: feita3 == 'sim'
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: secondary, onPrimary: backVerde),
+                                  onPressed: () async {
+                                    final storage = FirebaseStorage.instance;
+
+                                    var ref = FirebaseFirestore.instance
+                                        .collection('Usuarios')
+                                        .doc(widget.uid);
+
+                                    PickedFile? fotoPerfil = await ImagePicker()
+                                        .getImage(source: ImageSource.gallery);
+                                    var file = File(fotoPerfil!.path);
+                                    var cadFoto = await storage
+                                        .ref()
+                                        .child(
+                                            'usuarios/${widget.uid}/foto/perfil/')
+                                        .putFile(file);
+                                    //
+                                    var imgUrl =
+                                        await cadFoto.ref.getDownloadURL();
+                                    //
+                                    ref.update({
+                                      'fotocrianca': imgUrl,
+                                    });
+                                    //
+                                    setState(() {
+                                      fotoLocal = imgUrl;
+                                    });
+                                    //
+                                    String time =
+                                        '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                    String title = 'Escovação do(a) $nome';
+                                    String body =
+                                        '$nome, fez a 3º Escovação do dia! às $time.';
+                                    if (nome != "") {
+                                      DocumentSnapshot snap =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                              .get();
+
+                                      var uidRes = snap['uidRes'];
+                                      DocumentSnapshot snapRes =
+                                          await FirebaseFirestore.instance
+                                              .collection('Usuarios')
+                                              .doc(uidRes)
+                                              .get();
+                                      String token = snapRes['token'];
+
+                                      print(token);
+                                      sendPushMessage(token, body, title);
+                                      await FirebaseFirestore.instance
+                                          .collection('Usuarios')
+                                          .doc(widget.uid)
+                                          .collection('Escovacao')
+                                          .doc('3')
+                                          .update({'feita': 'sim'});
+                                      await FirebaseFirestore.instance
+                                          .collection('Historico')
+                                          .doc(widget.uid)
+                                          .collection('Historico')
+                                          .doc(DateFormat('ddMMyyyy')
+                                              .format(DateTime.now()))
+                                          .set({
+                                        'data': DateFormat('dd/MM/yyyy')
+                                            .format(DateTime.now()),
+                                        'qtd': '3',
+                                        'time1': 'sim',
+                                        'time2': 'sim',
+                                        'time': 'sim',
+                                        'foto': fotoLocal,
+                                      });
+                                    }
+                                  },
+                                  child: Text(
+                                    'Enviar',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 20),
                       //Relatório Semanal
                       Container(
+                        height: Get.size.height * 0.38,
+                        width: Get.size.width,
                         decoration: BoxDecoration(
-                          color: background,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [shadow],
-                        ),
-                        width: cardWidth,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Relatório Semanal',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Dia',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                                Container(),
-                                Container(),
-                                Text(
-                                  'Minha Escovação',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                                Container(),
-                              ],
-                            ),
-                            //Segunda
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Segunda-Feira',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            '1',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Terça
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Terça-Feira',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Quarta
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Quarta-Feira',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Quinta
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Quinta-Feira',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Sexta
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Sexta-Feira',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Sábado
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Sábado',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            //Domingo
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: tamanhobarra - 90,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Domingo',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        //Quantidade de Escovações
-                                        Text(
-                                          '2',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Status
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.done,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(5, 0, 0, 0),
-                                          height: 24,
-                                          width: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
+                            boxShadow: [shadow],
+                            gradient: gradient,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Expanded(
+                          child: StreamBuilder(
+                            stream: historico.snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                    padding: EdgeInsets.all(10),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    child: ListView.builder(
+                                        physics: BouncingScrollPhysics(),
+                                        itemCount: snapshot.data!.docs.length,
+                                        itemBuilder: (context, index) {
+                                          final DocumentSnapshot
+                                              documentSnapshot =
+                                              snapshot.data!.docs[index];
+
+                                          return Container(
+                                            margin:
+                                                EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                  width: tamanhobarra * 0.5,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        documentSnapshot[
+                                                            'data'],
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                      //Quantidade de Escovações
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Text(
+                                                          documentSnapshot[
+                                                              'qtd'],
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                //Status
+                                                Container(
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                5, 0, 0, 0),
+                                                        height: 24,
+                                                        width: 24,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                        ),
+                                                        child: Icon(
+                                                          documentSnapshot[
+                                                                      'time1'] ==
+                                                                  'sim'
+                                                              ? Icons.done
+                                                              : Icons.close,
+                                                          color: documentSnapshot[
+                                                                      'time1'] ==
+                                                                  'sim'
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                5, 0, 0, 0),
+                                                        height: 24,
+                                                        width: 24,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                        ),
+                                                        child: Icon(
+                                                          documentSnapshot[
+                                                                      'time2'] ==
+                                                                  'sim'
+                                                              ? Icons.done
+                                                              : Icons.close,
+                                                          color: documentSnapshot[
+                                                                      'time2'] ==
+                                                                  'sim'
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                5, 0, 0, 0),
+                                                        height: 24,
+                                                        width: 24,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                        ),
+                                                        child: Icon(
+                                                          documentSnapshot[
+                                                                      'time3'] ==
+                                                                  'sim'
+                                                              ? Icons.done
+                                                              : Icons.close,
+                                                          color: documentSnapshot[
+                                                                      'time3'] ==
+                                                                  'sim'
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        }));
+                              } else if (snapshot.hasError) {
+                                print('erro: ${snapshot.error.toString()}');
+                                return Center(
+                                  child: Text(
+                                      'error: ${snapshot.error.toString()}'),
+                                );
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -1330,6 +1143,67 @@ class _HomePageState extends State<HomePage> {
       await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
           message.notification?.body, platformChannelSpecifics,
           payload: message.data['body']);
+    });
+  }
+
+  void getData() async {
+    DocumentSnapshot docRef = await FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(widget.uid)
+        .get();
+    setState(() {
+      nome = docRef['nome'];
+      fotoLocal = docRef['foto'];
+      pontos = docRef['pontos'];
+    });
+
+    //
+    //
+    final CollectionReference escovacao = FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(widget.uid)
+        .collection('Escovacao');
+    var esc1 = escovacao.doc('1').get().then((value) {
+      setState(() {
+        feita1 = value['feita'];
+        time1 = value['hora'];
+      });
+    });
+    var esc2 = escovacao.doc('2').get().then((value) {
+      setState(() {
+        feita2 = value['feita'];
+        time2 = value['hora'];
+      });
+    });
+    var esc3 = escovacao.doc('3').get().then((value) {
+      setState(() {
+        feita3 = value['feita'];
+        time3 = value['hora'];
+      });
+    });
+    DocumentReference meta = await FirebaseFirestore.instance
+        .collection('Usuarios')
+        .doc(widget.uid)
+        .collection('Meta')
+        .doc('Meta');
+    meta.get().then((value) {
+      setState(() {
+        datainicio = value['datainicio'];
+        datatermino = value['datatermino'];
+        premio = value['premio'];
+        pontosatuais = value['pontosatuais'];
+        pontosdesejados = value['pontosdesejados'];
+        status = value['status'];
+        var num = (int.parse(pontosatuais) / int.parse(pontosdesejados)) * 100;
+        porcentagem = num / 100;
+        print(porcentagem);
+        var hora = DateTime.now().hour;
+        if (hora < 18) {
+          dia = 'sol';
+        } else {
+          dia = 'lua';
+        }
+      });
     });
   }
 }

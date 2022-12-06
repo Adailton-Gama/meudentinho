@@ -17,12 +17,7 @@ class DefinirEscovacao extends StatefulWidget {
 class _DefinirEscovacaoState extends State<DefinirEscovacao> {
   final CollectionReference refUser =
       FirebaseFirestore.instance.collection('Usuarios');
-  TextEditingController emailControl = TextEditingController();
-  TextEditingController senhaControl = TextEditingController();
-  TextEditingController nomeControl = TextEditingController();
-  TextEditingController idadeControl = TextEditingController();
-  TextEditingController cpfControl = TextEditingController();
-  TextEditingController parentescoControl = TextEditingController();
+
   String adminEmail = '';
   String adminPass = '';
 
@@ -420,17 +415,24 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
   }
 
   void getData() async {
-    DocumentSnapshot docRef = await FirebaseFirestore.instance
+    final CollectionReference docRef = FirebaseFirestore.instance
         .collection('Usuarios')
         .doc(widget.uid)
-        .get();
-    setState(() {
-      emailControl.text = docRef['email'];
-      senhaControl.text = docRef['senha'];
-      nomeControl.text = docRef['nome'];
-      idadeControl.text = docRef['idade'];
-      cpfControl.text = docRef['cpf'];
-      parentescoControl.text = docRef['parentesco'];
+        .collection('Escovacao');
+    var esc1 = docRef.doc('1').get().then((value) {
+      setState(() {
+        t1 = value['hora'];
+      });
+    });
+    var esc2 = docRef.doc('2').get().then((value) {
+      setState(() {
+        t2 = value['hora'];
+      });
+    });
+    var esc3 = docRef.doc('3').get().then((value) {
+      setState(() {
+        t3 = value['hora'];
+      });
     });
   }
 }

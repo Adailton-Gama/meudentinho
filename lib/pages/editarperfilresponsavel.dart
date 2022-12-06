@@ -90,7 +90,7 @@ class _EditarResponsavelState extends State<EditarResponsavel> {
                   var imgUrl = await cadFoto.ref.getDownloadURL();
                   //
                   ref.update({
-                    'fotocrianca': imgUrl,
+                    'foto': imgUrl,
                   });
                   //
                   setState(() {

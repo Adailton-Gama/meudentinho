@@ -145,7 +145,7 @@ class _StartScreenState extends State<StartScreen> {
                                       .signInWithEmailAndPassword(
                                           email: emailControl.text,
                                           password: senhaControl.text);
-                                  // await Future.delayed(Duration(seconds: 2));
+                                  await Future.delayed(Duration(seconds: 2));
                                   var uid =
                                       FirebaseAuth.instance.currentUser?.uid;
                                   FirebaseFirestore.instance
@@ -176,7 +176,6 @@ class _StartScreenState extends State<StartScreen> {
                                                       .currentUser!.uid)));
                                     }
                                   });
-                                  getToken();
                                 } on FirebaseException catch (error) {
                                   print(error);
                                   ScaffoldMessenger.of(context)
@@ -330,9 +329,9 @@ class _StartScreenState extends State<StartScreen> {
           AndroidNotificationDetails(
         'lembrete',
         'lembrete',
-        importance: Importance.max,
+        importance: Importance.high,
         styleInformation: bigTextStyleInformation,
-        priority: Priority.max,
+        priority: Priority.high,
         playSound: true,
       );
       NotificationDetails platformChannelSpecifics = NotificationDetails(
@@ -357,7 +356,7 @@ class _StartScreenState extends State<StartScreen> {
   void checkUser() async {
     if (FirebaseAuth.instance.currentUser?.uid != null) {
       var uid = FirebaseAuth.instance.currentUser!.uid;
-      await FirebaseFirestore.instance
+      FirebaseFirestore.instance
           .collection('Usuarios')
           .doc(uid)
           .get()

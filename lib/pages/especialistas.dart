@@ -126,55 +126,55 @@ class _EspecialistasState extends State<Especialistas> {
                                     )),
                               ),
                             ),
-                            if (tipo != 'responsavel' && tipo != 'dentista')
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              MinhaEscovacao()),
-                                      (route) => false);
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: gradient,
-                                  ),
-                                  child: Text('Minha Escovação',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                      )),
-                                ),
-                              ),
-                            if (tipo != 'responsavel' && tipo != 'dentista')
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => MetaDiaria()),
-                                      (route) => false);
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: gradient,
-                                  ),
-                                  child: Text('Meta Diária',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                      )),
-                                ),
-                              ),
+                            // if (tipo != 'responsavel' && tipo != 'dentista')
+                            //   GestureDetector(
+                            //     onTap: () {
+                            //       Navigator.of(context).pushAndRemoveUntil(
+                            //           MaterialPageRoute(
+                            //               builder: (context) =>
+                            //                   MinhaEscovacao()),
+                            //           (route) => false);
+                            //     },
+                            //     child: Container(
+                            //       margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            //       padding: EdgeInsets.all(10),
+                            //       decoration: BoxDecoration(
+                            //         borderRadius: BorderRadius.circular(20),
+                            //         gradient: gradient,
+                            //       ),
+                            //       child: Text('Minha Escovação',
+                            //           textAlign: TextAlign.center,
+                            //           style: TextStyle(
+                            //             fontSize: 16,
+                            //             fontWeight: FontWeight.w800,
+                            //             color: Colors.white,
+                            //           )),
+                            //     ),
+                            //   ),
+                            // if (tipo != 'responsavel' && tipo != 'dentista')
+                            //   GestureDetector(
+                            //     onTap: () {
+                            //       Navigator.of(context).pushAndRemoveUntil(
+                            //           MaterialPageRoute(
+                            //               builder: (context) => MetaDiaria()),
+                            //           (route) => false);
+                            //     },
+                            //     child: Container(
+                            //       margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            //       padding: EdgeInsets.all(10),
+                            //       decoration: BoxDecoration(
+                            //         borderRadius: BorderRadius.circular(20),
+                            //         gradient: gradient,
+                            //       ),
+                            //       child: Text('Meta Diária',
+                            //           textAlign: TextAlign.center,
+                            //           style: TextStyle(
+                            //             fontSize: 16,
+                            //             fontWeight: FontWeight.w800,
+                            //             color: Colors.white,
+                            //           )),
+                            //     ),
+                            //   ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
