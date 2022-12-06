@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1024869967272",
+    "project_id": "meudentinho-57d84",
+    "storage_bucket": "meudentinho-57d84.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024869967272:android:09c8cac730c197c45b699d",
+        "android_client_info": {
+          "package_name": "com.example.meudentinho"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1024869967272-p2m0m139o98oi3p1l7h103khfej8ubk6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD82A2u3027OM0DtklNYOIQH-kMrD8TlB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1024869967272-p2m0m139o98oi3p1l7h103khfej8ubk6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
