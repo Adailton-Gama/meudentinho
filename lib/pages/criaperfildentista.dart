@@ -276,34 +276,6 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                                                       .doc(FirebaseAuth.instance
                                                           .currentUser?.uid
                                                           .toString())
-                                                      .set({
-                                                    'uid': FirebaseAuth.instance
-                                                        .currentUser?.uid
-                                                        .toString(),
-                                                    'nome': nomeControl.text,
-                                                    'especializacao':
-                                                        espControl.text,
-                                                    'locais': localControl.text,
-                                                    'descricao':
-                                                        descControl.text,
-                                                    'whatsapp':
-                                                        whatsControl.text,
-                                                    'instagram':
-                                                        instaControl.text,
-                                                    'foto': fotoLocal,
-                                                  });
-                                                } catch (e) {
-                                                  print(e);
-                                                }
-                                                try {
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection('Usuarios')
-                                                      .doc(widget.uid)
-                                                      .collection('Perfil')
-                                                      .doc(FirebaseAuth.instance
-                                                          .currentUser?.uid
-                                                          .toString())
                                                       .update({
                                                     'uid': FirebaseAuth.instance
                                                         .currentUser?.uid
@@ -321,7 +293,39 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                                                     'foto': fotoLocal,
                                                   });
                                                 } catch (e) {
-                                                  print(e);
+                                                  try {
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Usuarios')
+                                                        .doc(widget.uid)
+                                                        .collection('Perfil')
+                                                        .doc(FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            ?.uid
+                                                            .toString())
+                                                        .set({
+                                                      'uid': FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          ?.uid
+                                                          .toString(),
+                                                      'nome': nomeControl.text,
+                                                      'especializacao':
+                                                          espControl.text,
+                                                      'locais':
+                                                          localControl.text,
+                                                      'descricao':
+                                                          descControl.text,
+                                                      'whatsapp':
+                                                          whatsControl.text,
+                                                      'instagram':
+                                                          instaControl.text,
+                                                      'foto': fotoLocal,
+                                                    });
+                                                  } catch (e) {
+                                                    print(e);
+                                                  }
                                                 }
                                                 await FirebaseFirestore.instance
                                                     .collection('Usuarios')
@@ -330,6 +334,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                                                   'foto': fotoLocal,
                                                   'especializacao':
                                                       espControl.text,
+                                                  'perfil': 'feito',
                                                 });
                                                 ScaffoldMessenger.of(context)
                                                     .clearSnackBars();

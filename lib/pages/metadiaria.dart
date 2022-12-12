@@ -6,7 +6,7 @@ import 'package:meudentinho/pages/startScreen.dart';
 import '../config.dart';
 import '../homepage.dart';
 import 'especialistas.dart';
-import 'minhaescovacao.dart';
+import 'comoescovar.dart';
 import 'nossahistoria.dart';
 
 class MetaDiaria extends StatefulWidget {
@@ -92,7 +92,7 @@ class _MetaDiariaState extends State<MetaDiaria> {
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
-                                        builder: (context) => MinhaEscovacao()),
+                                        builder: (context) => ComoEscovar()),
                                     (route) => false);
                               },
                               child: Container(

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meudentinho/componentes/especialistastile.dart';
-import 'package:meudentinho/pages/minhaescovacao.dart';
+import 'package:meudentinho/pages/comoescovar.dart';
 import 'package:meudentinho/models/app_data.dart' as appdata;
 import 'package:meudentinho/pages/startScreen.dart';
 import 'package:meudentinho/pages/teladentista.dart';
@@ -311,6 +311,7 @@ class _EspecialistasState extends State<Especialistas> {
     var result = await FirebaseFirestore.instance
         .collection('Usuarios')
         .where('nivel', isEqualTo: 'dentista')
+        .where('perfil', isEqualTo: 'feito')
         .get();
     setState(() {
       dentistas = result.docs.map((e) => e.data()).toList();

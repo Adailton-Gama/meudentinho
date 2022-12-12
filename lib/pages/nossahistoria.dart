@@ -9,7 +9,7 @@ import '../config.dart';
 import '../homepage.dart';
 import 'especialistas.dart';
 import 'metadiaria.dart';
-import 'minhaescovacao.dart';
+import 'comoescovar.dart';
 
 class NossaHistoria extends StatefulWidget {
   const NossaHistoria({Key? key}) : super(key: key);

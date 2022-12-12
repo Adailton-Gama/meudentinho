@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:meudentinho/config.dart';
 import 'package:meudentinho/pages/especialistas.dart';
 import 'package:meudentinho/pages/metadiaria.dart';
-import 'package:meudentinho/pages/minhaescovacao.dart';
+import 'package:meudentinho/pages/comoescovar.dart';
 import 'package:meudentinho/pages/nossahistoria.dart';
 import 'package:meudentinho/pages/startScreen.dart';
 import 'package:http/http.dart' as http;
@@ -33,19 +33,19 @@ class _HomePageState extends State<HomePage> {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    requestPermission();
+    getData();
+    initInfo();
+  }
+
   String nome = '';
   String _foto = '';
 
   String fotoLocal = '';
   String pontos = '';
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    requestPermission();
-    initInfo();
-    getData();
-  }
-
   String feita1 = 'não';
   String time1 = '00:00';
   String feita2 = 'não';
@@ -55,14 +55,17 @@ class _HomePageState extends State<HomePage> {
   String datainicio = '';
   String datatermino = '';
   String premio = '';
-  String pontosatuais = '';
+  int pontosatuais = 0;
   String pontosdesejados = '';
   String status = '';
   double porcentagem = 0;
+  double valorporc = 0;
 
   var dia;
   @override
   Widget build(BuildContext context) {
+    //
+    //
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
     CollectionReference historico = FirebaseFirestore.instance
@@ -127,29 +130,29 @@ class _HomePageState extends State<HomePage> {
                                     )),
                               ),
                             ),
-                            // GestureDetector(
-                            //   onTap: () {
-                            //     Navigator.of(context).pushAndRemoveUntil(
-                            //         MaterialPageRoute(
-                            //             builder: (context) => MinhaEscovacao()),
-                            //         (route) => false);
-                            //   },
-                            //   child: Container(
-                            //     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            //     padding: EdgeInsets.all(10),
-                            //     decoration: BoxDecoration(
-                            //       borderRadius: BorderRadius.circular(20),
-                            //       gradient: gradient,
-                            //     ),
-                            //     child: Text('Minha Escovação',
-                            //         textAlign: TextAlign.center,
-                            //         style: TextStyle(
-                            //           fontSize: 16,
-                            //           fontWeight: FontWeight.w800,
-                            //           color: Colors.white,
-                            //         )),
-                            //   ),
-                            // ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => ComoEscovar()),
+                                    (route) => false);
+                              },
+                              child: Container(
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: gradient,
+                                ),
+                                child: Text('Como escovar meu dentinho',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    )),
+                              ),
+                            ),
                             // GestureDetector(
                             //   onTap: () {
                             //     Navigator.of(context).pushAndRemoveUntil(
@@ -280,7 +283,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                   height: 150,
-                  width: Get.width,
+                  width: Get.size.width,
                   color: Color.fromRGBO(41, 212, 244, 1),
                   child: Column(
                     children: [
@@ -407,7 +410,7 @@ class _HomePageState extends State<HomePage> {
                                   fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '80%',
+                              '${valorporc.toStringAsFixed(2)}%',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600),
@@ -428,7 +431,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Container(
                               height: 10,
-                              width: tamanhobarra * 0.8,
+                              width: tamanhobarra * porcentagem,
                               decoration: BoxDecoration(
                                 color: frontBar,
                                 borderRadius: BorderRadius.circular(20),
@@ -523,88 +526,118 @@ class _HomePageState extends State<HomePage> {
                                         : Colors.red,
                                   ),
                                 ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary: secondary, onPrimary: backVerde),
-                                  onPressed: () async {
-                                    final storage = FirebaseStorage.instance;
+                                feita1 == 'sim'
+                                    ? Container()
+                                    : ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            primary: secondary,
+                                            onPrimary: backVerde),
+                                        onPressed: () async {
+                                          final storage =
+                                              FirebaseStorage.instance;
 
-                                    var ref = FirebaseFirestore.instance
-                                        .collection('Usuarios')
-                                        .doc(widget.uid);
-
-                                    PickedFile? fotoPerfil = await ImagePicker()
-                                        .getImage(source: ImageSource.gallery);
-                                    var file = File(fotoPerfil!.path);
-                                    var cadFoto = await storage
-                                        .ref()
-                                        .child(
-                                            'usuarios/${widget.uid}/foto/perfil/')
-                                        .putFile(file);
-                                    //
-                                    var imgUrl =
-                                        await cadFoto.ref.getDownloadURL();
-                                    //
-                                    ref.update({
-                                      'fotocrianca': imgUrl,
-                                    });
-                                    //
-                                    setState(() {
-                                      fotoLocal = imgUrl;
-                                    });
-                                    //
-                                    String time =
-                                        '${DateTime.now().hour}:${DateTime.now().minute}';
-
-                                    String title = 'Escovação do(a) $nome';
-                                    String body =
-                                        '$nome, fez a 1º Escovação do dia! às $time.';
-                                    if (nome != "") {
-                                      DocumentSnapshot snap =
-                                          await FirebaseFirestore.instance
+                                          var ref = FirebaseFirestore.instance
                                               .collection('Usuarios')
-                                              .doc(FirebaseAuth
-                                                  .instance.currentUser!.uid)
-                                              .get();
+                                              .doc(widget.uid);
 
-                                      var uidRes = snap['uidRes'];
-                                      DocumentSnapshot snapRes =
-                                          await FirebaseFirestore.instance
-                                              .collection('Usuarios')
-                                              .doc(uidRes)
-                                              .get();
-                                      String token = snapRes['token'];
+                                          PickedFile? fotoPerfil =
+                                              await ImagePicker().getImage(
+                                                  source: ImageSource.camera);
+                                          var file = File(fotoPerfil!.path);
+                                          var cadFoto = await storage
+                                              .ref()
+                                              .child(
+                                                  'usuarios/${widget.uid}/foto/historico/')
+                                              .putFile(file);
+                                          //
+                                          var imgUrl = await cadFoto.ref
+                                              .getDownloadURL();
+                                          //
 
-                                      print(token);
-                                      sendPushMessage(token, body, title);
-                                      await FirebaseFirestore.instance
-                                          .collection('Usuarios')
-                                          .doc(widget.uid)
-                                          .collection('Escovacao')
-                                          .doc('1')
-                                          .update({'feita': 'sim'});
-                                      await FirebaseFirestore.instance
-                                          .collection('Historico')
-                                          .doc(widget.uid)
-                                          .collection('Historico')
-                                          .doc(DateFormat('ddMMyyyy')
-                                              .format(DateTime.now()))
-                                          .set({
-                                        'data': DateFormat('dd/MM/yyyy')
-                                            .format(DateTime.now()),
-                                        'qtd': '1',
-                                        'time1': 'sim',
-                                        'foto': fotoLocal,
-                                      });
-                                    }
-                                  },
-                                  child: Text(
-                                    'Enviar',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ),
+                                          String time =
+                                              '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                          String title =
+                                              'Escovação do(a) $nome';
+                                          String body =
+                                              '$nome, fez a 1º Escovação do dia! às $time.';
+                                          if (nome != "") {
+                                            DocumentSnapshot snap =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .get();
+
+                                            var uidRes = snap['uidRes'];
+                                            DocumentSnapshot snapRes =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(uidRes)
+                                                    .get();
+                                            String token = snapRes['token'];
+
+                                            print(token);
+                                            sendPushMessage(token, body, title);
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(widget.uid)
+                                                .collection('Escovacao')
+                                                .doc('1')
+                                                .update({'feita': 'sim'});
+                                            var qtd;
+                                            var total;
+                                            await FirebaseFirestore.instance
+                                              ..collection('Historico')
+                                                  .doc(widget.uid)
+                                                  .collection('Historico')
+                                                  .doc(DateFormat('ddMMyyyy')
+                                                      .format(DateTime.now()))
+                                                  .get()
+                                                  .then((value) {
+                                                qtd = value['qtd'];
+
+                                                total = int.parse(qtd + 1);
+                                              });
+                                            await FirebaseFirestore.instance
+                                                .collection('Historico')
+                                                .doc(widget.uid)
+                                                .collection('Historico')
+                                                .doc(DateFormat('ddMMyyyy')
+                                                    .format(DateTime.now()))
+                                                .update({
+                                              'data': DateFormat('dd/MM/yyyy')
+                                                  .format(DateTime.now()),
+                                              'qtd': total,
+                                              'time1': 'sim',
+                                              'foto1': imgUrl,
+                                            });
+                                            var ponto = pontosatuais + 1;
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .collection('Meta')
+                                                .doc('Meta')
+                                                .update(
+                                                    {'pontosatuais': ponto});
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .update({'pontos': ponto});
+                                          }
+                                          await Future.delayed(
+                                              Duration(seconds: 2));
+                                          getData();
+                                        },
+                                        child: Text(
+                                          'Enviar',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -647,89 +680,118 @@ class _HomePageState extends State<HomePage> {
                                         : Colors.red,
                                   ),
                                 ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary: secondary, onPrimary: backVerde),
-                                  onPressed: () async {
-                                    final storage = FirebaseStorage.instance;
+                                feita2 == 'sim'
+                                    ? Container()
+                                    : ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            primary: secondary,
+                                            onPrimary: backVerde),
+                                        onPressed: () async {
+                                          final storage =
+                                              FirebaseStorage.instance;
 
-                                    var ref = FirebaseFirestore.instance
-                                        .collection('Usuarios')
-                                        .doc(widget.uid);
-
-                                    PickedFile? fotoPerfil = await ImagePicker()
-                                        .getImage(source: ImageSource.gallery);
-                                    var file = File(fotoPerfil!.path);
-                                    var cadFoto = await storage
-                                        .ref()
-                                        .child(
-                                            'usuarios/${widget.uid}/foto/perfil/')
-                                        .putFile(file);
-                                    //
-                                    var imgUrl =
-                                        await cadFoto.ref.getDownloadURL();
-                                    //
-                                    ref.update({
-                                      'fotocrianca': imgUrl,
-                                    });
-                                    //
-                                    setState(() {
-                                      fotoLocal = imgUrl;
-                                    });
-                                    //
-                                    String time =
-                                        '${DateTime.now().hour}:${DateTime.now().minute}';
-
-                                    String title = 'Escovação do(a) $nome';
-                                    String body =
-                                        '$nome, fez a 2º Escovação do dia! às $time.';
-                                    if (nome != "") {
-                                      DocumentSnapshot snap =
-                                          await FirebaseFirestore.instance
+                                          var ref = FirebaseFirestore.instance
                                               .collection('Usuarios')
-                                              .doc(FirebaseAuth
-                                                  .instance.currentUser!.uid)
-                                              .get();
+                                              .doc(widget.uid);
 
-                                      var uidRes = snap['uidRes'];
-                                      DocumentSnapshot snapRes =
-                                          await FirebaseFirestore.instance
-                                              .collection('Usuarios')
-                                              .doc(uidRes)
-                                              .get();
-                                      String token = snapRes['token'];
+                                          PickedFile? fotoPerfil =
+                                              await ImagePicker().getImage(
+                                                  source: ImageSource.camera);
+                                          var file = File(fotoPerfil!.path);
+                                          var cadFoto = await storage
+                                              .ref()
+                                              .child(
+                                                  'usuarios/${widget.uid}/foto/historico/')
+                                              .putFile(file);
+                                          //
+                                          var imgUrl = await cadFoto.ref
+                                              .getDownloadURL();
+                                          //
 
-                                      print(token);
-                                      sendPushMessage(token, body, title);
-                                      await FirebaseFirestore.instance
-                                          .collection('Usuarios')
-                                          .doc(widget.uid)
-                                          .collection('Escovacao')
-                                          .doc('2')
-                                          .update({'feita': 'sim'});
-                                      await FirebaseFirestore.instance
-                                          .collection('Historico')
-                                          .doc(widget.uid)
-                                          .collection('Historico')
-                                          .doc(DateFormat('ddMMyyyy')
-                                              .format(DateTime.now()))
-                                          .set({
-                                        'data': DateFormat('dd/MM/yyyy')
-                                            .format(DateTime.now()),
-                                        'qtd': '2',
-                                        'time1': 'sim',
-                                        'time2': 'sim',
-                                        'foto': fotoLocal,
-                                      });
-                                    }
-                                  },
-                                  child: Text(
-                                    'Enviar',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ),
+                                          String time =
+                                              '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                          String title =
+                                              'Escovação do(a) $nome';
+                                          String body =
+                                              '$nome, fez a 2º Escovação do dia! às $time.';
+                                          if (nome != "") {
+                                            DocumentSnapshot snap =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .get();
+
+                                            var uidRes = snap['uidRes'];
+                                            DocumentSnapshot snapRes =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(uidRes)
+                                                    .get();
+                                            String token = snapRes['token'];
+
+                                            print(token);
+                                            sendPushMessage(token, body, title);
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(widget.uid)
+                                                .collection('Escovacao')
+                                                .doc('2')
+                                                .update({'feita': 'sim'});
+                                            var qtd;
+                                            var total;
+                                            await FirebaseFirestore.instance
+                                              ..collection('Historico')
+                                                  .doc(widget.uid)
+                                                  .collection('Historico')
+                                                  .doc(DateFormat('ddMMyyyy')
+                                                      .format(DateTime.now()))
+                                                  .get()
+                                                  .then((value) {
+                                                qtd = value['qtd'];
+
+                                                total = int.parse(qtd + 1);
+                                              });
+                                            await FirebaseFirestore.instance
+                                                .collection('Historico')
+                                                .doc(widget.uid)
+                                                .collection('Historico')
+                                                .doc(DateFormat('ddMMyyyy')
+                                                    .format(DateTime.now()))
+                                                .update({
+                                              'data': DateFormat('dd/MM/yyyy')
+                                                  .format(DateTime.now()),
+                                              'qtd': total,
+                                              'time2': 'sim',
+                                              'foto2': imgUrl,
+                                            });
+                                            var ponto = pontosatuais + 1;
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .collection('Meta')
+                                                .doc('Meta')
+                                                .update(
+                                                    {'pontosatuais': ponto});
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .update({'pontos': ponto});
+                                          }
+                                          await Future.delayed(
+                                              Duration(seconds: 2));
+                                          getData();
+                                        },
+                                        child: Text(
+                                          'Enviar',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -772,90 +834,118 @@ class _HomePageState extends State<HomePage> {
                                         : Colors.red,
                                   ),
                                 ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary: secondary, onPrimary: backVerde),
-                                  onPressed: () async {
-                                    final storage = FirebaseStorage.instance;
+                                feita3 == 'sim'
+                                    ? Container()
+                                    : ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            primary: secondary,
+                                            onPrimary: backVerde),
+                                        onPressed: () async {
+                                          final storage =
+                                              FirebaseStorage.instance;
 
-                                    var ref = FirebaseFirestore.instance
-                                        .collection('Usuarios')
-                                        .doc(widget.uid);
-
-                                    PickedFile? fotoPerfil = await ImagePicker()
-                                        .getImage(source: ImageSource.gallery);
-                                    var file = File(fotoPerfil!.path);
-                                    var cadFoto = await storage
-                                        .ref()
-                                        .child(
-                                            'usuarios/${widget.uid}/foto/perfil/')
-                                        .putFile(file);
-                                    //
-                                    var imgUrl =
-                                        await cadFoto.ref.getDownloadURL();
-                                    //
-                                    ref.update({
-                                      'fotocrianca': imgUrl,
-                                    });
-                                    //
-                                    setState(() {
-                                      fotoLocal = imgUrl;
-                                    });
-                                    //
-                                    String time =
-                                        '${DateTime.now().hour}:${DateTime.now().minute}';
-
-                                    String title = 'Escovação do(a) $nome';
-                                    String body =
-                                        '$nome, fez a 3º Escovação do dia! às $time.';
-                                    if (nome != "") {
-                                      DocumentSnapshot snap =
-                                          await FirebaseFirestore.instance
+                                          var ref = FirebaseFirestore.instance
                                               .collection('Usuarios')
-                                              .doc(FirebaseAuth
-                                                  .instance.currentUser!.uid)
-                                              .get();
+                                              .doc(widget.uid);
 
-                                      var uidRes = snap['uidRes'];
-                                      DocumentSnapshot snapRes =
-                                          await FirebaseFirestore.instance
-                                              .collection('Usuarios')
-                                              .doc(uidRes)
-                                              .get();
-                                      String token = snapRes['token'];
+                                          PickedFile? fotoPerfil =
+                                              await ImagePicker().getImage(
+                                                  source: ImageSource.camera);
+                                          var file = File(fotoPerfil!.path);
+                                          var cadFoto = await storage
+                                              .ref()
+                                              .child(
+                                                  'usuarios/${widget.uid}/foto/historico/')
+                                              .putFile(file);
+                                          //
+                                          var imgUrl = await cadFoto.ref
+                                              .getDownloadURL();
+                                          //
 
-                                      print(token);
-                                      sendPushMessage(token, body, title);
-                                      await FirebaseFirestore.instance
-                                          .collection('Usuarios')
-                                          .doc(widget.uid)
-                                          .collection('Escovacao')
-                                          .doc('3')
-                                          .update({'feita': 'sim'});
-                                      await FirebaseFirestore.instance
-                                          .collection('Historico')
-                                          .doc(widget.uid)
-                                          .collection('Historico')
-                                          .doc(DateFormat('ddMMyyyy')
-                                              .format(DateTime.now()))
-                                          .set({
-                                        'data': DateFormat('dd/MM/yyyy')
-                                            .format(DateTime.now()),
-                                        'qtd': '3',
-                                        'time1': 'sim',
-                                        'time2': 'sim',
-                                        'time': 'sim',
-                                        'foto': fotoLocal,
-                                      });
-                                    }
-                                  },
-                                  child: Text(
-                                    'Enviar',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ),
+                                          String time =
+                                              '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                          String title =
+                                              'Escovação do(a) $nome';
+                                          String body =
+                                              '$nome, fez a 3º Escovação do dia! às $time.';
+                                          if (nome != "") {
+                                            DocumentSnapshot snap =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .get();
+
+                                            var uidRes = snap['uidRes'];
+                                            DocumentSnapshot snapRes =
+                                                await FirebaseFirestore.instance
+                                                    .collection('Usuarios')
+                                                    .doc(uidRes)
+                                                    .get();
+                                            String token = snapRes['token'];
+
+                                            print(token);
+                                            sendPushMessage(token, body, title);
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(widget.uid)
+                                                .collection('Escovacao')
+                                                .doc('3')
+                                                .update({'feita': 'sim'});
+                                            var qtd;
+                                            var total;
+                                            await FirebaseFirestore.instance
+                                              ..collection('Historico')
+                                                  .doc(widget.uid)
+                                                  .collection('Historico')
+                                                  .doc(DateFormat('ddMMyyyy')
+                                                      .format(DateTime.now()))
+                                                  .get()
+                                                  .then((value) {
+                                                qtd = value['qtd'];
+
+                                                total = int.parse(qtd + 1);
+                                              });
+                                            await FirebaseFirestore.instance
+                                                .collection('Historico')
+                                                .doc(widget.uid)
+                                                .collection('Historico')
+                                                .doc(DateFormat('ddMMyyyy')
+                                                    .format(DateTime.now()))
+                                                .update({
+                                              'data': DateFormat('dd/MM/yyyy')
+                                                  .format(DateTime.now()),
+                                              'qtd': total,
+                                              'time3': 'sim',
+                                              'foto3': imgUrl,
+                                            });
+                                            var ponto = pontosatuais + 1;
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .collection('Meta')
+                                                .doc('Meta')
+                                                .update(
+                                                    {'pontosatuais': ponto});
+                                            await FirebaseFirestore.instance
+                                                .collection('Usuarios')
+                                                .doc(FirebaseAuth
+                                                    .instance.currentUser!.uid)
+                                                .update({'pontos': ponto});
+                                          }
+                                          await Future.delayed(
+                                              Duration(seconds: 2));
+                                          getData();
+                                        },
+                                        child: Text(
+                                          'Enviar',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -918,7 +1008,8 @@ class _HomePageState extends State<HomePage> {
                                                             Alignment.center,
                                                         child: Text(
                                                           documentSnapshot[
-                                                              'qtd'],
+                                                                  'qtd']
+                                                              .toString(),
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.white,
@@ -1154,7 +1245,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       nome = docRef['nome'];
       fotoLocal = docRef['foto'];
-      pontos = docRef['pontos'];
     });
 
     //
@@ -1167,18 +1257,21 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         feita1 = value['feita'];
         time1 = value['hora'];
+        print(time1);
       });
     });
     var esc2 = escovacao.doc('2').get().then((value) {
       setState(() {
         feita2 = value['feita'];
         time2 = value['hora'];
+        print(time2);
       });
     });
     var esc3 = escovacao.doc('3').get().then((value) {
       setState(() {
         feita3 = value['feita'];
         time3 = value['hora'];
+        print(time3);
       });
     });
     DocumentReference meta = await FirebaseFirestore.instance
@@ -1194,8 +1287,9 @@ class _HomePageState extends State<HomePage> {
         pontosatuais = value['pontosatuais'];
         pontosdesejados = value['pontosdesejados'];
         status = value['status'];
-        var num = (int.parse(pontosatuais) / int.parse(pontosdesejados)) * 100;
+        var num = pontosatuais / int.parse(pontosdesejados) * 100;
         porcentagem = num / 100;
+        valorporc = porcentagem * 100;
         print(porcentagem);
         var hora = DateTime.now().hour;
         if (hora < 18) {

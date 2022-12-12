@@ -7,7 +7,7 @@ import 'package:meudentinho/pages/criarcadastrocrianca.dart';
 import 'package:meudentinho/pages/editarperfilresponsavel.dart';
 import 'package:meudentinho/pages/especialistas.dart';
 import 'package:meudentinho/pages/metadiaria.dart';
-import 'package:meudentinho/pages/minhaescovacao.dart';
+import 'package:meudentinho/pages/comoescovar.dart';
 import 'package:meudentinho/pages/monitorarcrianca.dart';
 import 'package:meudentinho/pages/nossahistoria.dart';
 import 'package:meudentinho/pages/startScreen.dart';
