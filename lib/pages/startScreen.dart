@@ -345,6 +345,7 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   void saveToken(String token) async {
+    await Future.delayed(Duration(seconds: 2));
     await FirebaseFirestore.instance
         .collection('Usuarios')
         .doc(FirebaseAuth.instance.currentUser!.uid)

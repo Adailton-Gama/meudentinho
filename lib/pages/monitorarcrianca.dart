@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:meudentinho/pages/criarmetas.dart';
 import 'package:meudentinho/pages/definirescovacao.dart';
+import 'package:meudentinho/pages/detailsHistorico.dart';
 import 'package:meudentinho/pages/editarcrianca.dart';
 
 import '../config.dart';
@@ -43,13 +44,15 @@ class _EditarCriancaState extends State<EditarCrianca> {
   String pontosdesejados = '';
   String status = '';
   double porcentagem = 0;
+  double valorporcentagem = 0;
   Widget build(BuildContext context) {
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
-    CollectionReference historico = FirebaseFirestore.instance
+    var historico = FirebaseFirestore.instance
         .collection('Historico')
         .doc(widget.uid)
-        .collection('Historico');
+        .collection('Historico')
+        .orderBy('data');
     int qtd = 0;
     return Scaffold(
       appBar: AppBar(
@@ -503,7 +506,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   fontWeight: FontWeight.w600),
                             ),
                             Text(
-                              '${porcentagem * 100}%',
+                              '${valorporcentagem.toStringAsFixed(2)}%',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600),
@@ -613,172 +616,218 @@ class _EditarCriancaState extends State<EditarCrianca> {
                     Container(
                       height: Get.size.height * 0.38,
                       width: Get.size.width,
-                      child: Expanded(
-                        child: StreamBuilder(
-                          stream: historico.snapshots(),
-                          builder:
-                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  child: ListView.builder(
-                                      physics: BouncingScrollPhysics(),
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        final DocumentSnapshot
-                                            documentSnapshot =
-                                            snapshot.data!.docs[index];
-                                        if (documentSnapshot['time1'] ==
-                                            'sim') {
-                                          print('time1 ok');
-                                          qtd++;
-                                        }
-                                        if (documentSnapshot['time2'] ==
-                                            'sim') {
-                                          print('time2 ok');
-                                          qtd++;
-                                        }
-                                        if (documentSnapshot['time3'] ==
-                                            'sim') {
-                                          print('time3 ok');
-                                          qtd++;
-                                        }
-                                        return Container(
+                      child: StreamBuilder(
+                        stream: historico.snapshots(),
+                        builder:
+                            (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasData) {
+                            return Container(
+                                height: Get.size.height * 0.3,
+                                width: Get.size.width * 0.9,
+                                child: ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      final DocumentSnapshot documentSnapshot =
+                                          snapshot.data!.docs[index];
+                                      if (documentSnapshot['time1'] == 'sim') {
+                                        print('time1 ok');
+                                        qtd++;
+                                      }
+                                      if (documentSnapshot['time2'] == 'sim') {
+                                        print('time2 ok');
+                                        qtd++;
+                                      }
+                                      if (documentSnapshot['time3'] == 'sim') {
+                                        print('time3 ok');
+                                        qtd++;
+                                      }
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DetailsHistorico(
+                                                        data: documentSnapshot[
+                                                            'data'],
+                                                        hora1: documentSnapshot[
+                                                            'hora1'],
+                                                        foto1: documentSnapshot[
+                                                            'foto1'],
+                                                        hora2: documentSnapshot[
+                                                            'hora2'],
+                                                        foto2: documentSnapshot[
+                                                            'foto2'],
+                                                        hora3: documentSnapshot[
+                                                            'hora3'],
+                                                        foto3: documentSnapshot[
+                                                            'foto3'],
+                                                      )));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            color: titulo,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            boxShadow: [shadow],
+                                          ),
                                           margin:
-                                              EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                              EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                          child: Column(
                                             children: [
-                                              Container(
-                                                width: tamanhobarra * 0.5,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      documentSnapshot['data'],
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.w500),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    width: tamanhobarra * 0.5,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          documentSnapshot[
+                                                              'data'],
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                        //Quantidade de Escovações
+                                                        Align(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Text(
+                                                            documentSnapshot[
+                                                                    'qtd']
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    //Quantidade de Escovações
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Text(
-                                                        documentSnapshot['qtd'],
-                                                        style: TextStyle(
+                                                  ),
+                                                  //Status
+                                                  Container(
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          margin: EdgeInsets
+                                                              .fromLTRB(
+                                                                  5, 0, 0, 0),
+                                                          height: 24,
+                                                          width: 24,
+                                                          decoration:
+                                                              BoxDecoration(
                                                             color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                          ),
+                                                          child: Icon(
+                                                            documentSnapshot[
+                                                                        'time1'] ==
+                                                                    'sim'
+                                                                ? Icons.done
+                                                                : Icons.close,
+                                                            color: documentSnapshot[
+                                                                        'time1'] ==
+                                                                    'sim'
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin: EdgeInsets
+                                                              .fromLTRB(
+                                                                  5, 0, 0, 0),
+                                                          height: 24,
+                                                          width: 24,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                          ),
+                                                          child: Icon(
+                                                            documentSnapshot[
+                                                                        'time2'] ==
+                                                                    'sim'
+                                                                ? Icons.done
+                                                                : Icons.close,
+                                                            color: documentSnapshot[
+                                                                        'time2'] ==
+                                                                    'sim'
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin: EdgeInsets
+                                                              .fromLTRB(
+                                                                  5, 0, 0, 0),
+                                                          height: 24,
+                                                          width: 24,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                          ),
+                                                          child: Icon(
+                                                            documentSnapshot[
+                                                                        'time3'] ==
+                                                                    'sim'
+                                                                ? Icons.done
+                                                                : Icons.close,
+                                                            color: documentSnapshot[
+                                                                        'time3'] ==
+                                                                    'sim'
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                              //Status
                                               Container(
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      margin:
-                                                          EdgeInsets.fromLTRB(
-                                                              5, 0, 0, 0),
-                                                      height: 24,
-                                                      width: 24,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                      ),
-                                                      child: Icon(
-                                                        documentSnapshot[
-                                                                    'time1'] ==
-                                                                'sim'
-                                                            ? Icons.done
-                                                            : Icons.close,
-                                                        color: documentSnapshot[
-                                                                    'time1'] ==
-                                                                'sim'
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      margin:
-                                                          EdgeInsets.fromLTRB(
-                                                              5, 0, 0, 0),
-                                                      height: 24,
-                                                      width: 24,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                      ),
-                                                      child: Icon(
-                                                        documentSnapshot[
-                                                                    'time2'] ==
-                                                                'sim'
-                                                            ? Icons.done
-                                                            : Icons.close,
-                                                        color: documentSnapshot[
-                                                                    'time2'] ==
-                                                                'sim'
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      margin:
-                                                          EdgeInsets.fromLTRB(
-                                                              5, 0, 0, 0),
-                                                      height: 24,
-                                                      width: 24,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                      ),
-                                                      child: Icon(
-                                                        documentSnapshot[
-                                                                    'time3'] ==
-                                                                'sim'
-                                                            ? Icons.done
-                                                            : Icons.close,
-                                                        color: documentSnapshot[
-                                                                    'time3'] ==
-                                                                'sim'
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
+                                                child: Text('Ver Detalhes',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                              ),
                                             ],
                                           ),
-                                        );
-                                      }));
-                            } else if (snapshot.hasError) {
-                              print('erro: ${snapshot.error.toString()}');
-                              return Center(
-                                child:
-                                    Text('error: ${snapshot.error.toString()}'),
-                              );
-                            }
+                                        ),
+                                      );
+                                    }));
+                          } else if (snapshot.hasError) {
+                            print('erro: ${snapshot.error.toString()}');
                             return Center(
-                              child: CircularProgressIndicator(),
+                              child:
+                                  Text('error: ${snapshot.error.toString()}'),
                             );
-                          },
-                        ),
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -838,12 +887,15 @@ class _EditarCriancaState extends State<EditarCrianca> {
         datainicio = value['datainicio'];
         datatermino = value['datatermino'];
         premio = value['premio'];
-        pontosatuais = value['pontosatuais'];
-        pontosdesejados = value['pontosdesejados'];
-        status = value['status'];
+        pontosatuais = value['pontosatuais'].toString();
+        pontosdesejados = value['pontosdesejados'].toString();
+        status = value['status'].toString();
         var num = (int.parse(pontosatuais) / int.parse(pontosdesejados)) * 100;
         porcentagem = num / 100;
+        valorporcentagem = porcentagem * 100;
         print(porcentagem);
+        print(pontosatuais);
+        print(pontosdesejados);
       });
     });
   }

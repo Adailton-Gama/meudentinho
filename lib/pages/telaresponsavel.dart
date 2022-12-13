@@ -382,140 +382,135 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                     Container(
                       height: Get.size.height * 0.38,
                       width: Get.size.width,
-                      child: Expanded(
-                        child: StreamBuilder(
-                          stream: _criancaRef.snapshots(),
-                          builder:
-                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  child: ListView.builder(
-                                      physics: BouncingScrollPhysics(),
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        final DocumentSnapshot
-                                            documentSnapshot =
-                                            snapshot.data!.docs[index];
-                                        return Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                          padding:
-                                              EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                          width: Get.size.width,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: shadowColor,
-                                                blurRadius: 2,
-                                                spreadRadius: 1,
-                                              )
-                                            ],
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    5, 0, 5, 0),
-                                                height: 40,
-                                                width: 40,
-                                                decoration: BoxDecoration(
-                                                    gradient: gradient,
+                      child: StreamBuilder(
+                        stream: _criancaRef.snapshots(),
+                        builder:
+                            (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasData) {
+                            return Container(
+                                height: Get.size.height * 0.3,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                child: ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      final DocumentSnapshot documentSnapshot =
+                                          snapshot.data!.docs[index];
+                                      return Container(
+                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        width: Get.size.width,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: shadowColor,
+                                              blurRadius: 2,
+                                              spreadRadius: 1,
+                                            )
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  5, 0, 5, 0),
+                                              height: 40,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                  gradient: gradient,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  image: DecorationImage(
+                                                      fit: BoxFit.cover,
+                                                      image: NetworkImage(
+                                                          documentSnapshot[
+                                                              'foto']))),
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Nome: ${documentSnapshot['nome']}',
+                                                  style: TextStyle(
+                                                      color: titulo,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  'Nascimento: ${documentSnapshot['idade']}',
+                                                  style: TextStyle(
+                                                      color: titulo,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  'Parentesco: ${documentSnapshot['parentesco']}',
+                                                  style: TextStyle(
+                                                      color: titulo,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  10, 0, 10, 0),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: titulo,
+                                                  onPrimary: background,
+                                                  elevation: 3,
+                                                  shape:
+                                                      const RoundedRectangleBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            100),
-                                                    image: DecorationImage(
-                                                        fit: BoxFit.cover,
-                                                        image: NetworkImage(
-                                                            documentSnapshot[
-                                                                'foto']))),
-                                              ),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Nome: ${documentSnapshot['nome']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Text(
-                                                    'Nascimento: ${documentSnapshot['idade']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Text(
-                                                    'Parentesco: ${documentSnapshot['parentesco']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    10, 0, 10, 0),
-                                                child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    primary: titulo,
-                                                    onPrimary: background,
-                                                    elevation: 3,
-                                                    shape:
-                                                        const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(10),
-                                                      ),
+                                                        BorderRadius.all(
+                                                      Radius.circular(10),
                                                     ),
                                                   ),
-                                                  onPressed: () {
-                                                    Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                EditarCrianca(
-                                                                  uid:
-                                                                      documentSnapshot
-                                                                          .id,
-                                                                )));
-                                                  },
-                                                  child: Text(
-                                                    'Ver',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16),
-                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EditarCrianca(
+                                                                uid:
+                                                                    documentSnapshot
+                                                                        .id,
+                                                              )));
+                                                },
+                                                child: Text(
+                                                  'Ver',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        );
-                                      }));
-                            } else if (snapshot.hasError) {
-                              print('erro: ${snapshot.error.toString()}');
-                              return Center(
-                                child:
-                                    Text('error: ${snapshot.error.toString()}'),
-                              );
-                            }
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }));
+                          } else if (snapshot.hasError) {
+                            print('erro: ${snapshot.error.toString()}');
                             return Center(
-                              child: CircularProgressIndicator(),
+                              child:
+                                  Text('error: ${snapshot.error.toString()}'),
                             );
-                          },
-                        ),
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
                       ),
                     ),
                   ],

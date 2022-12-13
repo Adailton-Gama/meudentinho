@@ -210,6 +210,7 @@ class _CriarMetasState extends State<CriarMetas> {
                                                 'premio': premioControl.text,
                                                 'status': status,
                                               });
+                                              Navigator.of(context).pop();
                                             }
                                           },
                                           child: Text(
