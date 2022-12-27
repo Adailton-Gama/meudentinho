@@ -81,7 +81,7 @@ class _StartScreenState extends State<StartScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     image: DecorationImage(
-                      image: AssetImage('assets/icon/icon.png'),
+                      image: AssetImage('assets/icon/LOGO SOBERANA.png'),
                     ),
                   ),
                 ),
@@ -346,12 +346,14 @@ class _StartScreenState extends State<StartScreen> {
 
   void saveToken(String token) async {
     await Future.delayed(Duration(seconds: 2));
-    await FirebaseFirestore.instance
-        .collection('Usuarios')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({
-      'token': token,
-    });
+    try {
+      await FirebaseFirestore.instance
+          .collection('Usuarios')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
+        'token': token,
+      });
+    } catch (e) {}
   }
 
   void checkUser() async {

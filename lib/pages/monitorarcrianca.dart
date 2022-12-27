@@ -1,12 +1,19 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:meudentinho/pages/criarmetas.dart';
 import 'package:meudentinho/pages/definirescovacao.dart';
 import 'package:meudentinho/pages/detailsHistorico.dart';
 import 'package:meudentinho/pages/editarcrianca.dart';
+import 'package:http/http.dart' as http;
 
 import '../config.dart';
 
@@ -21,14 +28,27 @@ class EditarCrianca extends StatefulWidget {
 }
 
 class _EditarCriancaState extends State<EditarCrianca> {
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   @override
   String nome = '';
   String fotoLocal = '';
   String pontos = '';
+  String sexo = 'Menino';
+  Timer? timer;
   void initState() {
     // TODO: implement initState
     super.initState();
     getData();
+    timer = Timer.periodic(Duration(seconds: 10), (timer) => getData());
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    timer!.cancel();
+    print('Timer Cancelado!');
   }
 
   String feita1 = 'não';
@@ -40,8 +60,8 @@ class _EditarCriancaState extends State<EditarCrianca> {
   String datainicio = '';
   String datatermino = '';
   String premio = '';
-  String pontosatuais = '';
-  String pontosdesejados = '';
+  int pontosatuais = 0;
+  int pontosdesejados = 0;
   String status = '';
   double porcentagem = 0;
   double valorporcentagem = 0;
@@ -56,7 +76,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
     int qtd = 0;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -83,7 +103,8 @@ class _EditarCriancaState extends State<EditarCrianca> {
                   width: cardWidth,
                   margin: EdgeInsets.only(top: 20),
                   decoration: BoxDecoration(
-                      color: background,
+                      // color: sexo == 'Menino' ? background : backgroundRosa,
+                      gradient: sexo == 'Menino' ? gradient : gradientRosa,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [shadow]),
                   child: Column(
@@ -108,13 +129,21 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                 Text(
                                   nome,
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: sexo == 'Menino'
+                                        ? Colors.white
+                                        : secondaryRosa,
                                   ),
                                 ),
                                 Text(
-                                  'Pontuação: $pontos',
+                                  'Pontuação: $pontosatuais',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: sexo == 'Menino'
+                                        ? Colors.white
+                                        : secondaryRosa,
                                   ),
                                 ),
                               ],
@@ -126,8 +155,9 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       //Botão
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -148,8 +178,9 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -159,8 +190,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
                         ),
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: ((context) =>
-                                  DefinirEscovacao(uid: widget.uid))));
+                              builder: ((context) => DefinirEscovacao(
+                                    uid: widget.uid,
+                                    sexo: sexo,
+                                  ))));
                         },
                         child: Text(
                           'Definir Escovação',
@@ -169,8 +202,9 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -181,7 +215,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
-                                  CriarMetas(uid: widget.uid)));
+                                  CriarMetas(uid: widget.uid, sexo: sexo)));
                         },
                         child: Text(
                           'Criar Meta',
@@ -197,7 +231,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -209,7 +243,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -236,7 +270,11 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: feita1 == 'sim' ? backVerde : Colors.red,
+                              color: feita1 == 'sim'
+                                  ? Colors.green
+                                  : feita1 == 'pendente'
+                                      ? secondary
+                                      : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,16 +283,20 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                 '1º Escovação',
                                 style: TextStyle(
                                     color: feita1 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita1 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
                                 time1,
                                 style: TextStyle(
                                     color: feita1 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita1 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -265,10 +307,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  feita1 == 'sim' ? Icons.done : Icons.close,
+                                  size: 20,
+                                  feita1 == 'sim'
+                                      ? Icons.done
+                                      : feita1 == 'pendente'
+                                          ? Icons.timer_outlined
+                                          : Icons.close,
                                   color: feita1 == 'sim'
                                       ? Colors.green
-                                      : Colors.red,
+                                      : feita1 == 'pendente'
+                                          ? Colors.orange
+                                          : Colors.red,
                                 ),
                               ),
                             ],
@@ -278,7 +327,11 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: feita2 == 'sim' ? backVerde : Colors.red,
+                              color: feita2 == 'sim'
+                                  ? Colors.green
+                                  : feita2 == 'pendente'
+                                      ? secondary
+                                      : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -287,16 +340,20 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                 '2º Escovação',
                                 style: TextStyle(
                                     color: feita2 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita2 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
                                 time2,
                                 style: TextStyle(
                                     color: feita2 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita2 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -307,10 +364,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  feita2 == 'sim' ? Icons.done : Icons.close,
+                                  size: 20,
+                                  feita2 == 'sim'
+                                      ? Icons.done
+                                      : feita2 == 'pendente'
+                                          ? Icons.timer_outlined
+                                          : Icons.close,
                                   color: feita2 == 'sim'
                                       ? Colors.green
-                                      : Colors.red,
+                                      : feita2 == 'pendente'
+                                          ? Colors.orange
+                                          : Colors.red,
                                 ),
                               ),
                             ],
@@ -320,7 +384,11 @@ class _EditarCriancaState extends State<EditarCrianca> {
                           margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: feita3 == 'sim' ? backVerde : Colors.red,
+                              color: feita3 == 'sim'
+                                  ? Colors.green
+                                  : feita3 == 'pendente'
+                                      ? secondary
+                                      : Colors.red,
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -329,16 +397,20 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                 '3º Escovação',
                                 style: TextStyle(
                                     color: feita3 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita3 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
                                 time3,
                                 style: TextStyle(
                                     color: feita3 == 'sim'
-                                        ? Colors.blue
-                                        : Colors.white,
+                                        ? Colors.white
+                                        : feita3 == 'pendente'
+                                            ? Colors.orange
+                                            : Colors.white,
                                     fontWeight: FontWeight.w700),
                               ),
                               Container(
@@ -349,10 +421,17 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Icon(
-                                  feita3 == 'sim' ? Icons.done : Icons.close,
+                                  size: 20,
+                                  feita3 == 'sim'
+                                      ? Icons.done
+                                      : feita3 == 'pendente'
+                                          ? Icons.timer_outlined
+                                          : Icons.close,
                                   color: feita3 == 'sim'
                                       ? Colors.green
-                                      : Colors.red,
+                                      : feita3 == 'pendente'
+                                          ? Colors.orange
+                                          : Colors.red,
                                 ),
                               ),
                             ],
@@ -367,7 +446,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -433,14 +512,14 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                         fontWeight: FontWeight.w300),
                                   ),
                                   Text(
-                                    pontosatuais,
+                                    pontosatuais.toString(),
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w800),
                                   ),
                                   Text(
-                                    pontosdesejados,
+                                    pontosdesejados.toString(),
                                     style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white,
@@ -477,14 +556,14 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                         fontWeight: FontWeight.w300),
                                   ),
                                   Text(
-                                    pontosatuais,
+                                    pontosatuais.toString(),
                                     style: TextStyle(
                                         fontSize: 30,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w800),
                                   ),
                                   Text(
-                                    pontosdesejados,
+                                    pontosdesejados.toString(),
                                     style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.white,
@@ -521,7 +600,8 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               height: 10,
                               width: Get.size.width,
                               decoration: BoxDecoration(
-                                color: backBar,
+                                color:
+                                    sexo == 'Menino' ? backBar : backgroundRosa,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
@@ -529,7 +609,9 @@ class _EditarCriancaState extends State<EditarCrianca> {
                               height: 10,
                               width: tamanhobarra * porcentagem,
                               decoration: BoxDecoration(
-                                color: secondary,
+                                color: sexo == 'Menino'
+                                    ? secondary
+                                    : secondaryRosa,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
@@ -547,19 +629,54 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                 ),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: pontosatuais >= pontosdesejados
+                                ? () async {
+                                    String time =
+                                        '${DateTime.now().hour}:${DateTime.now().minute}';
+
+                                    String title = 'Seu Prêmio Chegou!';
+                                    String nomeRes = '';
+                                    var res = await FirebaseFirestore.instance
+                                        .collection('Usuarios')
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .get()
+                                        .then((value) {
+                                      nomeRes = value['nome'];
+                                    });
+                                    String body =
+                                        ' Parabéns $nome, você concluiu a sua meta de escovação, fale com $nomeRes, para receber seu Prêmio!!!';
+                                    DocumentSnapshot snap =
+                                        await FirebaseFirestore.instance
+                                            .collection('Usuarios')
+                                            .doc(widget.uid)
+                                            .get();
+                                    String token = snap['token'];
+                                    sendPushMessage(token, body, title);
+                                  }
+                                : null,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.card_giftcard,
-                                  color: titulo,
+                                  color: pontosatuais >= pontosdesejados
+                                      ? sexo == 'Menino'
+                                          ? titulo
+                                          : secondaryRosa
+                                      : Colors.white,
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  'Dar Prêmio',
+                                  pontosatuais >= pontosdesejados
+                                      ? 'Dar Prêmio'
+                                      : 'Em andamento',
                                   style: TextStyle(
-                                    color: titulo,
+                                    color: pontosatuais >= pontosdesejados
+                                        ? sexo == 'Menino'
+                                            ? titulo
+                                            : secondaryRosa
+                                        : Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -575,7 +692,7 @@ class _EditarCriancaState extends State<EditarCrianca> {
                       margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -601,14 +718,18 @@ class _EditarCriancaState extends State<EditarCrianca> {
                         Text(
                           'Dia',
                           style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w700),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         Container(),
                         Container(),
                         Text(
                           'Status da Escovação:',
                           style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w700),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -642,38 +763,123 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                         print('time3 ok');
                                         qtd++;
                                       }
+
                                       return GestureDetector(
                                         onTap: () {
                                           Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DetailsHistorico(
-                                                        data: documentSnapshot[
-                                                            'data'],
-                                                        hora1: documentSnapshot[
-                                                            'hora1'],
-                                                        foto1: documentSnapshot[
-                                                            'foto1'],
-                                                        hora2: documentSnapshot[
-                                                            'hora2'],
-                                                        foto2: documentSnapshot[
-                                                            'foto2'],
-                                                        hora3: documentSnapshot[
-                                                            'hora3'],
-                                                        foto3: documentSnapshot[
-                                                            'foto3'],
-                                                      )));
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  documentSnapshot['time3'] ==
+                                                              'sim' ||
+                                                          documentSnapshot[
+                                                                  'time3'] ==
+                                                              'pendente'
+                                                      ? DetailsHistorico(
+                                                          pontosatuais:
+                                                              pontosatuais,
+                                                          uid: widget.uid,
+                                                          feito3:
+                                                              documentSnapshot[
+                                                                  'time3'],
+                                                          feito2:
+                                                              documentSnapshot[
+                                                                  'time2'],
+                                                          feito1:
+                                                              documentSnapshot[
+                                                                  'time1'],
+                                                          data:
+                                                              documentSnapshot[
+                                                                  'data'],
+                                                          hora1:
+                                                              documentSnapshot[
+                                                                  'hora1'],
+                                                          foto1:
+                                                              documentSnapshot[
+                                                                  'foto1'],
+                                                          hora2:
+                                                              documentSnapshot[
+                                                                  'hora2'],
+                                                          foto2:
+                                                              documentSnapshot[
+                                                                  'foto2'],
+                                                          hora3:
+                                                              documentSnapshot[
+                                                                  'hora3'],
+                                                          foto3:
+                                                              documentSnapshot[
+                                                                  'foto3'],
+                                                        )
+                                                      : documentSnapshot[
+                                                                      'time2'] ==
+                                                                  'sim' ||
+                                                              documentSnapshot[
+                                                                      'time2'] ==
+                                                                  'pendente'
+                                                          ? DetailsHistorico(
+                                                              pontosatuais:
+                                                                  pontosatuais,
+                                                              uid: widget.uid,
+                                                              feito2:
+                                                                  documentSnapshot[
+                                                                      'time2'],
+                                                              feito1:
+                                                                  documentSnapshot[
+                                                                      'time1'],
+                                                              data:
+                                                                  documentSnapshot[
+                                                                      'data'],
+                                                              hora1:
+                                                                  documentSnapshot[
+                                                                      'hora1'],
+                                                              foto1:
+                                                                  documentSnapshot[
+                                                                      'foto1'],
+                                                              hora2:
+                                                                  documentSnapshot[
+                                                                      'hora2'],
+                                                              foto2:
+                                                                  documentSnapshot[
+                                                                      'foto2'],
+                                                            )
+                                                          : DetailsHistorico(
+                                                              pontosatuais:
+                                                                  pontosatuais,
+                                                              uid: widget.uid,
+                                                              feito1:
+                                                                  documentSnapshot[
+                                                                      'time1'],
+                                                              data:
+                                                                  documentSnapshot[
+                                                                      'data'],
+                                                              hora1:
+                                                                  documentSnapshot[
+                                                                      'hora1'],
+                                                              foto1:
+                                                                  documentSnapshot[
+                                                                      'foto1'],
+                                                            ),
+                                            ),
+                                          );
+                                          print('apertado');
+                                          print(
+                                              '3: ${documentSnapshot['time3']}');
+                                          print(
+                                              '2: ${documentSnapshot['time2']}');
+                                          print(
+                                              '1: ${documentSnapshot['time1']}');
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(5),
                                           decoration: BoxDecoration(
-                                            color: titulo,
+                                            color: sexo == 'Menino'
+                                                ? titulo
+                                                : secondaryRosa,
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             boxShadow: [shadow],
                                           ),
-                                          margin:
-                                              EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                          margin: EdgeInsets.fromLTRB(
+                                              10, 10, 10, 0),
                                           child: Column(
                                             children: [
                                               Row(
@@ -736,16 +942,29 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                                                         100),
                                                           ),
                                                           child: Icon(
+                                                            size: 20,
                                                             documentSnapshot[
                                                                         'time1'] ==
                                                                     'sim'
                                                                 ? Icons.done
-                                                                : Icons.close,
+                                                                : documentSnapshot[
+                                                                            'time1'] ==
+                                                                        'pendente'
+                                                                    ? Icons
+                                                                        .timer_outlined
+                                                                    : Icons
+                                                                        .close,
                                                             color: documentSnapshot[
                                                                         'time1'] ==
                                                                     'sim'
                                                                 ? Colors.green
-                                                                : Colors.red,
+                                                                : documentSnapshot[
+                                                                            'time1'] ==
+                                                                        'pendente'
+                                                                    ? Colors
+                                                                        .orange
+                                                                    : Colors
+                                                                        .red,
                                                           ),
                                                         ),
                                                         Container(
@@ -763,16 +982,29 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                                                         100),
                                                           ),
                                                           child: Icon(
+                                                            size: 20,
                                                             documentSnapshot[
                                                                         'time2'] ==
                                                                     'sim'
                                                                 ? Icons.done
-                                                                : Icons.close,
+                                                                : documentSnapshot[
+                                                                            'time2'] ==
+                                                                        'pendente'
+                                                                    ? Icons
+                                                                        .timer_outlined
+                                                                    : Icons
+                                                                        .close,
                                                             color: documentSnapshot[
                                                                         'time2'] ==
                                                                     'sim'
                                                                 ? Colors.green
-                                                                : Colors.red,
+                                                                : documentSnapshot[
+                                                                            'time2'] ==
+                                                                        'pendente'
+                                                                    ? Colors
+                                                                        .orange
+                                                                    : Colors
+                                                                        .red,
                                                           ),
                                                         ),
                                                         Container(
@@ -790,16 +1022,29 @@ class _EditarCriancaState extends State<EditarCrianca> {
                                                                         100),
                                                           ),
                                                           child: Icon(
+                                                            size: 20,
                                                             documentSnapshot[
                                                                         'time3'] ==
                                                                     'sim'
                                                                 ? Icons.done
-                                                                : Icons.close,
+                                                                : documentSnapshot[
+                                                                            'time3'] ==
+                                                                        'pendente'
+                                                                    ? Icons
+                                                                        .timer_outlined
+                                                                    : Icons
+                                                                        .close,
                                                             color: documentSnapshot[
                                                                         'time3'] ==
                                                                     'sim'
                                                                 ? Colors.green
-                                                                : Colors.red,
+                                                                : documentSnapshot[
+                                                                            'time3'] ==
+                                                                        'pendente'
+                                                                    ? Colors
+                                                                        .orange
+                                                                    : Colors
+                                                                        .red,
                                                           ),
                                                         ),
                                                       ],
@@ -840,6 +1085,103 @@ class _EditarCriancaState extends State<EditarCrianca> {
     );
   }
 
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAA7p8Cpag:APA91bER64RHN6_Dzerkj0iP7cTq-3QtSDp4TburDJg9E07apboc5X3e0gZKPbniBetQysSBaS0IcAqc8IJ3POHH5l7X82VMwlrvINH2W9UEEgXMJvDLrP_fFUv-ARurwgI4UVp6pF0v'
+          },
+          body: jsonEncode(
+            <String, dynamic>{
+              'priority': 'high',
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'status': 'done',
+                'body': body,
+                'title': title,
+              },
+              "notification": <String, dynamic>{
+                "title": title,
+                "body": body,
+                "android_channel_id": "lembrete"
+              },
+              "to": token,
+            },
+          ));
+    } catch (e) {
+      if (kDebugMode) {
+        print("error push notifications $e");
+      }
+    }
+  }
+
+  void requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: true,
+      provisional: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('Usuário Autorizado');
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print('Usuário com permissão temporária');
+    } else {
+      print('Usuário com permissão negada');
+    }
+  }
+
+  initInfo() {
+    var androidInitialize =
+        const AndroidInitializationSettings('@mipmap/launcher_icon');
+    var iOSInitialize = const IOSInitializationSettings();
+    var initializationsSettings =
+        InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
+    flutterLocalNotificationsPlugin.initialize(initializationsSettings,
+        onSelectNotification: (String? payload) async {
+      try {
+        if (payload != null && payload.isNotEmpty) {
+        } else {}
+      } catch (e) {}
+      return;
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print("..............Messagem..............");
+      print(
+          "Messagem: ${message.notification?.title}/${message.notification?.body}");
+      BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+        message.notification!.body.toString(),
+        htmlFormatBigText: true,
+        contentTitle: message.notification!.title.toString(),
+        htmlFormatContent: true,
+      );
+
+      AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'lembrete',
+        'lembrete',
+        importance: Importance.high,
+        styleInformation: bigTextStyleInformation,
+        priority: Priority.high,
+        playSound: true,
+      );
+      NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: const IOSNotificationDetails(),
+      );
+      await flutterLocalNotificationsPlugin.show(0, message.notification?.title,
+          message.notification?.body, platformChannelSpecifics,
+          payload: message.data['body']);
+    });
+  }
+
   void getData() async {
     DocumentSnapshot docRef = await FirebaseFirestore.instance
         .collection('Usuarios')
@@ -849,8 +1191,15 @@ class _EditarCriancaState extends State<EditarCrianca> {
         .get();
     setState(() {
       nome = docRef['nome'];
+      sexo = docRef['sexo'];
+      var nomeseparado = nome.split(' ');
+      for (int i = 0; i < nomeseparado.length; i++) {
+        nomeseparado[i] =
+            nomeseparado[i][0].toUpperCase() + nomeseparado[i].substring(1);
+      }
       fotoLocal = docRef['foto'];
       pontos = docRef['pontos'];
+      nome = nomeseparado.join(' ');
     });
 
     //
@@ -887,10 +1236,10 @@ class _EditarCriancaState extends State<EditarCrianca> {
         datainicio = value['datainicio'];
         datatermino = value['datatermino'];
         premio = value['premio'];
-        pontosatuais = value['pontosatuais'].toString();
-        pontosdesejados = value['pontosdesejados'].toString();
+        pontosatuais = int.parse(value['pontosatuais'].toString());
+        pontosdesejados = int.parse(value['pontosdesejados']);
         status = value['status'].toString();
-        var num = (int.parse(pontosatuais) / int.parse(pontosdesejados)) * 100;
+        var num = pontosatuais / pontosdesejados * 100;
         porcentagem = num / 100;
         valorporcentagem = porcentagem * 100;
         print(porcentagem);

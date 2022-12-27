@@ -34,6 +34,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
   TextEditingController descControl = TextEditingController();
   TextEditingController whatsControl = TextEditingController();
   TextEditingController instaControl = TextEditingController();
+  String sexo = 'Menino';
 
   String adminEmail = '';
   String adminPass = '';
@@ -62,7 +63,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -88,7 +89,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -99,7 +100,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -181,7 +182,9 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                                           margin:
                                               EdgeInsets.fromLTRB(0, 0, 0, 10),
                                           decoration: BoxDecoration(
-                                            color: background,
+                                            color: sexo == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                             image: DecorationImage(
@@ -250,7 +253,9 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: background,
+                                            primary: sexo == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(18),
@@ -446,6 +451,7 @@ class _CriarPerfilDentistaState extends State<CriarPerfilDentista> {
         whatsControl.text = value.docs[0]['whatsapp'];
         instaControl.text = value.docs[0]['instagram'];
         fotoLocal = value.docs[0]['foto'];
+        sexo = value.docs[0]['sexo'];
       });
     });
   }

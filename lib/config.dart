@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 
 //
 Color titulo = Color.fromRGBO(18, 156, 183, 1);
+Color tituloRosa = Color.fromRGBO(255, 0, 0, 1);
+
 //
 Color background = Color.fromRGBO(39, 187, 215, 1);
+Color backgroundRosa = Color.fromRGBO(255, 215, 215, 1);
 //
 Color secondary = Color.fromRGBO(16, 88, 152, 1);
+Color secondaryRosa = Color.fromRGBO(243, 99, 124, 1);
 //
 Color backBar = Color.fromRGBO(22, 222, 246, 1);
 //
@@ -19,6 +23,12 @@ Color shadowColor = Colors.black.withAlpha(100);
 Gradient gradient = LinearGradient(colors: [
   Color.fromRGBO(18, 156, 183, 1),
   Color.fromRGBO(90, 222, 246, 1),
+]);
+//
+Gradient gradientRosa = LinearGradient(colors: [
+  Color.fromRGBO(243, 99, 124, 1),
+  Color.fromRGBO(244, 193, 187, 1),
+  Color.fromRGBO(240, 158, 162, 1),
 ]);
 //
 Gradient gradientSair = LinearGradient(colors: [

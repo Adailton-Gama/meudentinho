@@ -8,8 +8,10 @@ import 'package:intl/intl.dart';
 import '../config.dart';
 
 class DefinirEscovacao extends StatefulWidget {
-  DefinirEscovacao({Key? key, required this.uid}) : super(key: key);
+  DefinirEscovacao({Key? key, required this.uid, required this.sexo})
+      : super(key: key);
   String uid;
+  String sexo;
   @override
   State<DefinirEscovacao> createState() => _DefinirEscovacaoState();
 }
@@ -44,7 +46,7 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: widget.sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -70,7 +72,7 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: widget.sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -81,7 +83,7 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: widget.sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -130,7 +132,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                         margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                                         padding: EdgeInsets.all(5),
                                         decoration: BoxDecoration(
-                                            color: Colors.grey,
+                                            color: widget.sexo == 'Menino'
+                                                ? Colors.grey
+                                                : backgroundRosa,
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         child: Row(
@@ -140,13 +144,17 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                             Text(
                                               '1º Escovação',
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: widget.sexo == 'Menino'
+                                                      ? Colors.white
+                                                      : secondaryRosa,
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Text(
                                               t1,
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: widget.sexo == 'Menino'
+                                                      ? Colors.white
+                                                      : secondaryRosa,
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Container(),
@@ -160,7 +168,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: background,
+                                            primary: widget.sexo == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(18),
@@ -217,7 +227,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                         margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                                         padding: EdgeInsets.all(5),
                                         decoration: BoxDecoration(
-                                            color: Colors.grey,
+                                            color: widget.sexo == 'Menino'
+                                                ? Colors.grey
+                                                : backgroundRosa,
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         child: Row(
@@ -227,13 +239,17 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                             Text(
                                               '2º Escovação',
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: widget.sexo == 'Menino'
+                                                      ? Colors.white
+                                                      : secondaryRosa,
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Text(
                                               t2,
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: widget.sexo == 'Menino'
+                                                      ? Colors.white
+                                                      : secondaryRosa,
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Container(),
@@ -247,7 +263,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: background,
+                                            primary: widget.sexo == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(18),
@@ -300,7 +318,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                               EdgeInsets.fromLTRB(0, 5, 0, 0),
                                           padding: EdgeInsets.all(5),
                                           decoration: BoxDecoration(
-                                              color: Colors.grey,
+                                              color: widget.sexo == 'Menino'
+                                                  ? Colors.grey
+                                                  : backgroundRosa,
                                               borderRadius:
                                                   BorderRadius.circular(10)),
                                           child: Row(
@@ -311,14 +331,20 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                                 Text(
                                                   '3º Escovação',
                                                   style: TextStyle(
-                                                      color: Colors.white,
+                                                      color: widget.sexo ==
+                                                              'Menino'
+                                                          ? Colors.white
+                                                          : secondaryRosa,
                                                       fontWeight:
                                                           FontWeight.w700),
                                                 ),
                                                 Text(
                                                   t3,
                                                   style: TextStyle(
-                                                      color: Colors.white,
+                                                      color: widget.sexo ==
+                                                              'Menino'
+                                                          ? Colors.white
+                                                          : secondaryRosa,
                                                       fontWeight:
                                                           FontWeight.w700),
                                                 ),
@@ -331,7 +357,9 @@ class _DefinirEscovacaoState extends State<DefinirEscovacao> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: background,
+                                            primary: widget.sexo == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(18),

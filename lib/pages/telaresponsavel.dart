@@ -34,6 +34,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
       .collection('Usuarios')
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection('Criancas');
+  String sexo = 'Menino';
 
   @override
   void initState() {
@@ -159,9 +160,10 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     try {
-                      FirebaseAuth.instance.signOut();
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.redAccent,
@@ -169,6 +171,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                             'Saindo da Conta...',
                             textAlign: TextAlign.center,
                           )));
+                      await Future.delayed(Duration(milliseconds: 1500));
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => StartScreen()),
@@ -199,7 +202,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -227,7 +230,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                   width: cardWidth,
                   margin: EdgeInsets.only(top: 20),
                   decoration: BoxDecoration(
-                      color: background,
+                      gradient: sexo == 'Menino' ? gradient : gradientRosa,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [shadow]),
                   child: Column(
@@ -289,8 +292,9 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                       //Botão
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -312,8 +316,9 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -342,7 +347,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -353,7 +358,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -442,21 +447,27 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                                                 Text(
                                                   'Nome: ${documentSnapshot['nome']}',
                                                   style: TextStyle(
-                                                      color: titulo,
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
                                                 Text(
                                                   'Nascimento: ${documentSnapshot['idade']}',
                                                   style: TextStyle(
-                                                      color: titulo,
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
                                                 Text(
                                                   'Parentesco: ${documentSnapshot['parentesco']}',
                                                   style: TextStyle(
-                                                      color: titulo,
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -467,8 +478,12 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                                                   10, 0, 10, 0),
                                               child: ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  primary: titulo,
-                                                  onPrimary: background,
+                                                  primary: sexo == 'Menino'
+                                                      ? titulo
+                                                      : secondaryRosa,
+                                                  onPrimary: sexo == 'Menino'
+                                                      ? background
+                                                      : backgroundRosa,
                                                   elevation: 3,
                                                   shape:
                                                       const RoundedRectangleBorder(
@@ -483,9 +498,9 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
                                                       MaterialPageRoute(
                                                           builder: (context) =>
                                                               EditarCrianca(
-                                                                uid:
-                                                                    documentSnapshot
-                                                                        .id,
+                                                                uid: documentSnapshot
+                                                                    .id
+                                                                    .toString(),
                                                               )));
                                                 },
                                                 child: Text(
@@ -529,6 +544,7 @@ class _TelaResponsavelState extends State<TelaResponsavel> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
     setState(() {
+      sexo = docRef['sexo'];
       nome = docRef['nome'];
       fotoLocal = docRef['foto'];
       var hora = DateTime.now().hour;

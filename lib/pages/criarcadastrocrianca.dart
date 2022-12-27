@@ -54,6 +54,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
   Widget build(BuildContext context) {
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
+    String selectedValue = 'Menino';
     var size = MediaQuery.of(context).size;
     var padBottom = MediaQuery.of(context).padding.bottom;
     var padTop = MediaQuery.of(context).padding.top;
@@ -219,6 +220,34 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                         keyType:
                                             TextInputType.numberWithOptions(),
                                       ),
+                                      DropdownButtonFormField(
+                                        elevation: 0,
+                                        dropdownColor: background,
+                                        borderRadius: BorderRadius.circular(20),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            child: Text('Menino'),
+                                            value: 'Menino',
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('Menina'),
+                                            value: 'Menina',
+                                          ),
+                                        ],
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            selectedValue = value!;
+                                          });
+                                        },
+                                        value: selectedValue,
+                                      ),
+                                      SizedBox(height: 15),
                                       CustomTextForm(
                                         controller: cpfControl,
                                         icon: Icons.description,
@@ -294,6 +323,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'uidRes': widget.uidRes,
                                                     'foto': fotoLocal,
                                                     'pontos': '0',
+                                                    'sexo': selectedValue,
                                                     'dtcadastro':
                                                         Timestamp.now(),
                                                   });
@@ -315,6 +345,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'nivel': widget.tipo,
                                                     'foto': fotoLocal,
                                                     'pontos': '0',
+                                                    'sexo': selectedValue,
                                                     'dtcadastro':
                                                         Timestamp.now(),
                                                   });
@@ -422,6 +453,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'uidRes': widget.uidRes,
                                                     'foto': fotoLocal,
                                                     'pontos': '0',
+                                                    'sexo': selectedValue,
                                                     'dtcadastro':
                                                         Timestamp.now(),
                                                   });
@@ -448,6 +480,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
                                                     'foto': fotoLocal,
                                                     'pontos': '0',
                                                     'tokenRes': mtoken,
+                                                    'sexo': selectedValue,
                                                     'dtcadastro':
                                                         Timestamp.now(),
                                                   });

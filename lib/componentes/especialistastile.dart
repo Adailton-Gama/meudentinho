@@ -11,7 +11,9 @@ class EspecialistasTile extends StatefulWidget {
     required this.especialidade,
     required this.imgUrl,
     required this.name,
+    required this.sexo,
   }) : super(key: key);
+  String sexo;
   String uid;
   String imgUrl;
   String name;
@@ -29,7 +31,9 @@ class _EspecialistasTileState extends State<EspecialistasTile> {
             context,
             MaterialPageRoute(
                 builder: (context) => EspecialistaDetails(
-                    uid: widget.uid, imgUrl: widget.imgUrl)));
+                      uid: widget.uid,
+                      imgUrl: widget.imgUrl,
+                    )));
       },
       child: Card(
         elevation: 3,
@@ -48,7 +52,7 @@ class _EspecialistasTileState extends State<EspecialistasTile> {
                 width: 10,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: background,
+                  color: widget.sexo == 'Menino' ? background : secondaryRosa,
                 ),
                 child: Hero(
                   tag: widget.imgUrl,
@@ -64,6 +68,7 @@ class _EspecialistasTileState extends State<EspecialistasTile> {
                   //Nome
                   Text(
                     widget.name,
+                    softWrap: true,
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

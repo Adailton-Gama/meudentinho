@@ -33,7 +33,7 @@ class _TelaDentistaState extends State<TelaDentista> {
       .collection('Usuarios')
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection('Perfil');
-
+  String sexo = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -161,6 +161,7 @@ class _TelaDentistaState extends State<TelaDentista> {
                   onTap: () async {
                     try {
                       await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.redAccent,
@@ -168,6 +169,7 @@ class _TelaDentistaState extends State<TelaDentista> {
                             'Saindo da Conta...',
                             textAlign: TextAlign.center,
                           )));
+                      await Future.delayed(Duration(milliseconds: 1500));
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => StartScreen()),
@@ -198,7 +200,7 @@ class _TelaDentistaState extends State<TelaDentista> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -226,7 +228,7 @@ class _TelaDentistaState extends State<TelaDentista> {
                   width: cardWidth,
                   margin: EdgeInsets.only(top: 20),
                   decoration: BoxDecoration(
-                      color: background,
+                      gradient: sexo == 'Menino' ? gradient : gradientRosa,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [shadow]),
                   child: Column(
@@ -288,8 +290,9 @@ class _TelaDentistaState extends State<TelaDentista> {
                       //Botão
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -311,8 +314,9 @@ class _TelaDentistaState extends State<TelaDentista> {
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: titulo,
-                          onPrimary: background,
+                          primary: sexo == 'Menino' ? titulo : secondaryRosa,
+                          onPrimary:
+                              sexo == 'Menino' ? background : backgroundRosa,
                           elevation: 3,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -341,7 +345,7 @@ class _TelaDentistaState extends State<TelaDentista> {
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -352,7 +356,7 @@ class _TelaDentistaState extends State<TelaDentista> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -381,142 +385,148 @@ class _TelaDentistaState extends State<TelaDentista> {
                     Container(
                       height: Get.size.height * 0.38,
                       width: Get.size.width,
-                      child: Expanded(
-                        child: StreamBuilder(
-                          stream: dentistaRef.snapshots(),
-                          builder:
-                              (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
-                                  child: ListView.builder(
-                                      physics: BouncingScrollPhysics(),
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        final DocumentSnapshot
-                                            documentSnapshot =
-                                            snapshot.data!.docs[index];
-                                        return Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                          padding:
-                                              EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                          width: Get.size.width,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: shadowColor,
-                                                blurRadius: 2,
-                                                spreadRadius: 1,
-                                              )
-                                            ],
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    5, 0, 5, 0),
-                                                height: 40,
-                                                width: 40,
-                                                decoration: BoxDecoration(
-                                                    gradient: gradient,
+                      child: StreamBuilder(
+                        stream: dentistaRef.snapshots(),
+                        builder:
+                            (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasData) {
+                            return Container(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                height: Get.size.height * 0.3,
+                                child: ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      final DocumentSnapshot documentSnapshot =
+                                          snapshot.data!.docs[index];
+                                      return Container(
+                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        width: Get.size.width,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: shadowColor,
+                                              blurRadius: 2,
+                                              spreadRadius: 1,
+                                            )
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  5, 0, 5, 0),
+                                              height: 40,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                  gradient: gradient,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  image: DecorationImage(
+                                                      fit: BoxFit.cover,
+                                                      image: NetworkImage(
+                                                          documentSnapshot[
+                                                              'foto']))),
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Nome: ${documentSnapshot['nome']}',
+                                                  style: TextStyle(
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  'Esp.: ${documentSnapshot['especializacao']}',
+                                                  style: TextStyle(
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  'Whats: ${documentSnapshot['whatsapp']}',
+                                                  style: TextStyle(
+                                                      color: sexo == 'Menino'
+                                                          ? titulo
+                                                          : secondaryRosa,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.fromLTRB(
+                                                  10, 0, 10, 0),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: sexo == 'Menino'
+                                                      ? titulo
+                                                      : secondaryRosa,
+                                                  onPrimary: sexo == 'Menino'
+                                                      ? background
+                                                      : backgroundRosa,
+                                                  elevation: 3,
+                                                  shape:
+                                                      const RoundedRectangleBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            100),
-                                                    image: DecorationImage(
-                                                        fit: BoxFit.cover,
-                                                        image: NetworkImage(
-                                                            documentSnapshot[
-                                                                'foto']))),
-                                              ),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Nome: ${documentSnapshot['nome']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Text(
-                                                    'Esp.: ${documentSnapshot['especializacao']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Text(
-                                                    'Whats: ${documentSnapshot['whatsapp']}',
-                                                    style: TextStyle(
-                                                        color: titulo,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                              Container(
-                                                margin: EdgeInsets.fromLTRB(
-                                                    10, 0, 10, 0),
-                                                child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    primary: titulo,
-                                                    onPrimary: background,
-                                                    elevation: 3,
-                                                    shape:
-                                                        const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(10),
-                                                      ),
+                                                        BorderRadius.all(
+                                                      Radius.circular(10),
                                                     ),
                                                   ),
-                                                  onPressed: () {
-                                                    Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                EspecialistaDetails(
-                                                                  uid: widget
-                                                                      .uid,
-                                                                  imgUrl:
-                                                                      documentSnapshot[
-                                                                          'foto'],
-                                                                )));
-                                                  },
-                                                  child: Text(
-                                                    'Ver',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16),
-                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EspecialistaDetails(
+                                                                uid:
+                                                                    documentSnapshot[
+                                                                        'uid'],
+                                                                imgUrl:
+                                                                    documentSnapshot[
+                                                                        'foto'],
+                                                              )));
+                                                },
+                                                child: Text(
+                                                  'Ver',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        );
-                                      }));
-                            } else if (snapshot.hasError) {
-                              print('erro: ${snapshot.error.toString()}');
-                              return Center(
-                                child:
-                                    Text('error: ${snapshot.error.toString()}'),
-                              );
-                            }
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }));
+                          } else if (snapshot.hasError) {
+                            print('erro: ${snapshot.error.toString()}');
                             return Center(
-                              child: CircularProgressIndicator(),
+                              child:
+                                  Text('error: ${snapshot.error.toString()}'),
                             );
-                          },
-                        ),
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -536,6 +546,7 @@ class _TelaDentistaState extends State<TelaDentista> {
         .get();
     setState(() {
       nome = docRef['nome'];
+      sexo = docRef['sexo'];
       fotoLocal = docRef['foto'];
       var hora = DateTime.now().hour;
       if (hora < 18) {

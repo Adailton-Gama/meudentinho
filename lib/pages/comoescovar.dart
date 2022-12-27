@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,10 +23,24 @@ final GlobalKey<ScaffoldState> _key = GlobalKey();
 class _ComoEscovarState extends State<ComoEscovar> {
   VideoPlayerController controller =
       VideoPlayerController.asset('assets/video/comoescovar.mp4');
+  String sexo = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    if (FirebaseAuth.instance.currentUser?.uid != null) {
+      var uid = FirebaseAuth.instance.currentUser!.uid;
+      FirebaseFirestore.instance
+          .collection('Usuarios')
+          .doc(uid)
+          .get()
+          .then((value) {
+        String nivel = value['nivel'].toString();
+        setState(() {
+          sexo = value['sexo'];
+        });
+      });
+    }
     controller.addListener(() => setState(() {}));
     controller.setLooping(false);
     controller.initialize().then((_) => controller.play());
@@ -183,6 +198,7 @@ class _ComoEscovarState extends State<ComoEscovar> {
                   onTap: () async {
                     try {
                       await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.redAccent,
@@ -190,6 +206,7 @@ class _ComoEscovarState extends State<ComoEscovar> {
                             'Saindo da Conta...',
                             textAlign: TextAlign.center,
                           )));
+                      await Future.delayed(Duration(milliseconds: 1500));
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => StartScreen()),
@@ -220,7 +237,7 @@ class _ComoEscovarState extends State<ComoEscovar> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         centerTitle: true,
         title: Text('Como escovar meu dentinho'),
       ),
@@ -250,7 +267,9 @@ class _ComoEscovarState extends State<ComoEscovar> {
                                   child: Icon(
                                     Icons.play_circle_outline,
                                     size: 80,
-                                    color: backBar,
+                                    color: sexo == 'Menino'
+                                        ? backBar
+                                        : secondaryRosa,
                                   ),
                                 ),
                         )
@@ -263,8 +282,9 @@ class _ComoEscovarState extends State<ComoEscovar> {
                     controller,
                     allowScrubbing: true,
                     colors: VideoProgressColors(
-                      playedColor: titulo,
-                      backgroundColor: backBar,
+                      playedColor: sexo == 'Menino' ? titulo : secondaryRosa,
+                      backgroundColor:
+                          sexo == 'Menino' ? backBar : backgroundRosa,
                     ),
                   ),
                 ),
@@ -275,7 +295,7 @@ class _ComoEscovarState extends State<ComoEscovar> {
                     'Como escovar meu dentinho?',
                     textAlign: TextAlign.left,
                     style: TextStyle(
-                      color: secondary,
+                      color: sexo == 'Menino' ? secondary : secondaryRosa,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

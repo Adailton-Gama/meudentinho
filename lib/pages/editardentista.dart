@@ -36,6 +36,7 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
   TextEditingController celularControl = TextEditingController();
   TextEditingController cpfControl = TextEditingController();
   TextEditingController croControl = TextEditingController();
+  String selectedValue = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -51,7 +52,8 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor:
+            selectedValue == 'Menino ' ? background : secondaryRosa,
         centerTitle: true,
         title: Text('Editar Perfil'),
       ),
@@ -104,7 +106,8 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
                   padding: EdgeInsets.all(10),
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                   decoration: BoxDecoration(
-                    color: background,
+                    color:
+                        selectedValue == 'Menino' ? background : secondaryRosa,
                     borderRadius: BorderRadius.circular(100),
                     image: DecorationImage(
                       image: _foto.isNotEmpty
@@ -127,6 +130,33 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
                 icon: Icons.person,
                 label: 'Nome',
               ),
+              DropdownButtonFormField(
+                elevation: 0,
+                dropdownColor: background,
+                borderRadius: BorderRadius.circular(20),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    child: Text('Menino'),
+                    value: 'Menino',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Menina'),
+                    value: 'Menina',
+                  ),
+                ],
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedValue = value!;
+                  });
+                },
+                value: selectedValue,
+              ),
+              SizedBox(height: 15),
               CustomTextForm(
                 controller: celularControl,
                 icon: Icons.phone,
@@ -153,7 +183,8 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
                 width: Get.size.width,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: background,
+                    primary:
+                        selectedValue == 'Menino' ? background : secondaryRosa,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
@@ -178,6 +209,7 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
                           'cpf': cpfControl.text,
                           'foto': fotoLocal,
                           'cro': croControl.text,
+                          'sexo': selectedValue,
                           'nivel': 'dentista',
                         });
                         ScaffoldMessenger.of(context).clearSnackBars();
@@ -244,6 +276,7 @@ class _EditarDadosDentistaState extends State<EditarDadosDentista> {
       celularControl.text = docRef['telefone'];
       cpfControl.text = docRef['cpf'];
       fotoLocal = docRef['foto'];
+      selectedValue = docRef['sexo'];
     });
   }
 }

@@ -37,6 +37,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
   String _foto = '';
   PickedFile? foto;
   String mtoken = '';
+  String selectedValue = 'Menino';
   String fotoLocal =
       'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975';
   //
@@ -58,7 +59,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: selectedValue == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -84,7 +85,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: selectedValue == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -95,7 +96,8 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color:
+                            selectedValue == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -216,6 +218,34 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                         keyType:
                                             TextInputType.numberWithOptions(),
                                       ),
+                                      DropdownButtonFormField(
+                                        elevation: 0,
+                                        dropdownColor: background,
+                                        borderRadius: BorderRadius.circular(20),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            child: Text('Menino'),
+                                            value: 'Menino',
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('Menina'),
+                                            value: 'Menina',
+                                          ),
+                                        ],
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            selectedValue = value!;
+                                          });
+                                        },
+                                        value: selectedValue,
+                                      ),
+                                      SizedBox(height: 15),
                                       CustomTextForm(
                                         controller: cpfControl,
                                         icon: Icons.description,
@@ -234,7 +264,9 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: background,
+                                            primary: selectedValue == 'Menino'
+                                                ? background
+                                                : secondaryRosa,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(18),
@@ -282,6 +314,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                                   'parentesco':
                                                       parentescoControl.text,
                                                   'foto': fotoLocal,
+                                                  'sexo': selectedValue,
                                                   'tokenRes': mtoken,
                                                 });
 
@@ -392,6 +425,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
         .doc(widget.uid)
         .get();
     setState(() {
+      selectedValue = docRef['sexo'];
       emailControl.text = docRef['email'];
       senhaControl.text = docRef['senha'];
       nomeControl.text = docRef['nome'];

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meudentinho/pages/startScreen.dart';
+import 'package:meudentinho/pages/teladentista.dart';
 import 'package:meudentinho/pages/telaresponsavel.dart';
 
 import '../config.dart';
@@ -22,6 +23,7 @@ final GlobalKey<ScaffoldState> _key = GlobalKey();
 
 class _NossaHistoriaState extends State<NossaHistoria> {
   String tipo = '';
+  String sexo = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -34,6 +36,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
           .then((value) {
         String nivel = value['nivel'].toString();
         setState(() {
+          sexo = value['sexo'];
           tipo = nivel;
         });
       });
@@ -92,7 +95,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                                 } else if (tipo == 'dentista') {
                                   Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
-                                          builder: (context) => HomePage(
+                                          builder: (context) => TelaDentista(
                                               uid: FirebaseAuth
                                                   .instance.currentUser!.uid)),
                                       (route) => false);
@@ -226,6 +229,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                   onTap: () async {
                     try {
                       await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.redAccent,
@@ -233,6 +237,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                             'Saindo da Conta...',
                             textAlign: TextAlign.center,
                           )));
+                      await Future.delayed(Duration(milliseconds: 1500));
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => StartScreen()),
@@ -263,7 +268,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         centerTitle: true,
         title: Text('Nossa História'),
       ),
@@ -279,7 +284,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                   Text(
                     'Nossa História',
                     style: TextStyle(
-                      color: titulo,
+                      color: sexo == 'Menino' ? titulo : secondaryRosa,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),
@@ -296,7 +301,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                   Text(
                     'Parceria',
                     style: TextStyle(
-                      color: titulo,
+                      color: sexo == 'Menino' ? titulo : secondaryRosa,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),
@@ -326,7 +331,7 @@ class _NossaHistoriaState extends State<NossaHistoria> {
         8.Tiago Teixeira
                     ''',
                     style: TextStyle(
-                      color: titulo,
+                      color: sexo == 'Menino' ? titulo : secondaryRosa,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),

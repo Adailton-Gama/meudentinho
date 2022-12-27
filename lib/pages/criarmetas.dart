@@ -9,8 +9,10 @@ import 'package:meudentinho/componentes/customtextForm.dart';
 import '../config.dart';
 
 class CriarMetas extends StatefulWidget {
-  CriarMetas({Key? key, required this.uid}) : super(key: key);
+  CriarMetas({Key? key, required this.uid, required this.sexo})
+      : super(key: key);
   String uid;
+  String sexo;
   final idadeMask = MaskTextInputFormatter(
       mask: '##/##/####', filter: {'#': RegExp(r'[0-9]')});
   @override
@@ -52,7 +54,7 @@ class _CriarMetasState extends State<CriarMetas> {
         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: widget.sexo == 'Menino' ? background : secondaryRosa,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -78,7 +80,7 @@ class _CriarMetasState extends State<CriarMetas> {
                 margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                 decoration: BoxDecoration(
-                  gradient: gradient,
+                  gradient: widget.sexo == 'Menino' ? gradient : gradientRosa,
                   boxShadow: [shadow],
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -89,7 +91,7 @@ class _CriarMetasState extends State<CriarMetas> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                       width: Get.size.width,
                       decoration: BoxDecoration(
-                        color: titulo,
+                        color: widget.sexo == 'Menino' ? titulo : secondaryRosa,
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
@@ -125,7 +127,9 @@ class _CriarMetasState extends State<CriarMetas> {
                               Container(
                                 padding: EdgeInsets.all(size.width * 0.05),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: widget.sexo == 'Menino'
+                                      ? Colors.white
+                                      : backgroundRosa,
                                   borderRadius:
                                       BorderRadius.circular(size.width * 0.1),
                                 ),
@@ -137,7 +141,9 @@ class _CriarMetasState extends State<CriarMetas> {
                                         'Obs.: Cada ponto equivale a uma escovação.',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: titulo,
+                                          color: widget.sexo == 'Menino'
+                                              ? titulo
+                                              : secondaryRosa,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -175,8 +181,12 @@ class _CriarMetasState extends State<CriarMetas> {
                                         width: Get.size.width,
                                         child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            primary: titulo,
-                                            onPrimary: background,
+                                            primary: widget.sexo == 'Menino'
+                                                ? titulo
+                                                : secondaryRosa,
+                                            onPrimary: widget.sexo == 'Menino'
+                                                ? background
+                                                : backgroundRosa,
                                             elevation: 3,
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(

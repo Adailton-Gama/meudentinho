@@ -26,6 +26,7 @@ final GlobalKey<ScaffoldState> _key = GlobalKey();
 class _EspecialistasState extends State<Especialistas> {
   String tipo = '';
   List dentistas = [];
+  String sexo = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -39,6 +40,7 @@ class _EspecialistasState extends State<Especialistas> {
         String nivel = value['nivel'].toString();
         setState(() {
           tipo = nivel;
+          sexo = value['sexo'];
         });
       });
       getDentistas();
@@ -231,6 +233,7 @@ class _EspecialistasState extends State<Especialistas> {
                   onTap: () async {
                     try {
                       await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.redAccent,
@@ -238,6 +241,7 @@ class _EspecialistasState extends State<Especialistas> {
                             'Saindo da Conta...',
                             textAlign: TextAlign.center,
                           )));
+                      await Future.delayed(Duration(milliseconds: 1500));
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => StartScreen()),
@@ -268,7 +272,7 @@ class _EspecialistasState extends State<Especialistas> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
         centerTitle: true,
         title: Text('Fale com um Especialista'),
       ),
@@ -297,6 +301,7 @@ class _EspecialistasState extends State<Especialistas> {
                     especialidade: dentistas[index]['especializacao'],
                     imgUrl: dentistas[index]['foto'],
                     name: dentistas[index]['nome'],
+                    sexo: dentistas[index]['sexo'],
                   );
                 },
               ),

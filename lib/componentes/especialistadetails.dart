@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 import 'package:meudentinho/config.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/itemModel.dart';
 
 class EspecialistaDetails extends StatefulWidget {
+  EspecialistaDetails({
+    Key? key,
+    required this.uid,
+    required this.imgUrl,
+  }) : super(key: key);
   String uid;
   String imgUrl;
-  EspecialistaDetails({Key? key, required this.uid, required this.imgUrl})
-      : super(key: key);
 
   @override
   State<EspecialistaDetails> createState() => EespecialistDdetailsState();
@@ -18,6 +22,7 @@ class EspecialistaDetails extends StatefulWidget {
 
 class EespecialistDdetailsState extends State<EspecialistaDetails> {
   @override
+  String sexo = 'Menino';
   int itemCount = 1;
   String nome = '';
   String especializacao = '';
@@ -26,6 +31,7 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
   String whatsapp = '';
   String instagram = '';
   String foto = '';
+  Matrix4 _transform = Matrix4.identity();
 
   @override
   void initState() {
@@ -37,7 +43,7 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: sexo == 'Menino' ? background : secondaryRosa,
       body: SafeArea(
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,34 +61,72 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
             ),
           ),
           Container(
+            width: Get.size.width,
             padding: EdgeInsets.fromLTRB(20, 20, 10, 0),
             child: Row(
               children: [
                 Hero(
                   tag: widget.imgUrl,
-                  child: Image.network(
-                    widget.imgUrl,
-                    height: size.height * .4,
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => StatefulBuilder(
+                          builder: (context, StateSetter setState) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                child: Transform(
+                                  transform: _transform,
+                                  child: MatrixGestureDetector(
+                                    onMatrixUpdate: ((matrix,
+                                        translationDeltaMatrix,
+                                        scaleDeltaMatrix,
+                                        rotationDeltaMatrix) {
+                                      setState(() => _transform = matrix);
+                                    }),
+                                    child: Hero(
+                                        tag: widget.imgUrl,
+                                        child: Image.network(widget.imgUrl)),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: Text('Fechar'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Image.network(
+                      widget.imgUrl,
+                      height: size.height * .4,
+                    ),
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      nome,
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white),
-                    ),
-                    Text(
-                      especializacao,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        nome,
+                        softWrap: true,
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white),
                       ),
-                    ),
-                  ],
+                      Text(
+                        especializacao,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -93,7 +137,7 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
               padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               decoration: BoxDecoration(
                 boxShadow: [shadow],
-                color: Colors.white,
+                color: sexo == 'Menino' ? Colors.white : backgroundRosa,
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(40),
                   topLeft: Radius.circular(40),
@@ -177,7 +221,9 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
                                     padding: EdgeInsets.all(10),
                                     margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                                     decoration: BoxDecoration(
-                                      color: background,
+                                      color: sexo == 'Menino'
+                                          ? background
+                                          : secondaryRosa,
                                       boxShadow: [shadow],
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(20),
@@ -218,7 +264,9 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
                                     padding: EdgeInsets.all(10),
                                     margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                                     decoration: BoxDecoration(
-                                      color: background,
+                                      color: sexo == 'Menino'
+                                          ? background
+                                          : secondaryRosa,
                                       boxShadow: [shadow],
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(20),
@@ -278,6 +326,7 @@ class EespecialistDdetailsState extends State<EspecialistaDetails> {
         descricao = value.docs[0]['descricao'];
         whatsapp = value.docs[0]['whatsapp'];
         instagram = value.docs[0]['instagram'];
+        sexo = value.docs[0]['sexo'];
       });
     });
   }

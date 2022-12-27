@@ -36,6 +36,7 @@ class _EditarResponsavelState extends State<EditarResponsavel> {
   TextEditingController celularControl = TextEditingController();
   TextEditingController cpfControl = TextEditingController();
   TextEditingController croControl = TextEditingController();
+  String selectedValue = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -127,6 +128,33 @@ class _EditarResponsavelState extends State<EditarResponsavel> {
                 icon: Icons.person,
                 label: 'Nome',
               ),
+              DropdownButtonFormField(
+                elevation: 0,
+                dropdownColor: background,
+                borderRadius: BorderRadius.circular(20),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    child: Text('Menino'),
+                    value: 'Menino',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Menina'),
+                    value: 'Menina',
+                  ),
+                ],
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedValue = value!;
+                  });
+                },
+                value: selectedValue,
+              ),
+              SizedBox(height: 15),
               CustomTextForm(
                 controller: celularControl,
                 icon: Icons.phone,
@@ -169,6 +197,7 @@ class _EditarResponsavelState extends State<EditarResponsavel> {
                           'telefone': celularControl.text,
                           'cpf': cpfControl.text,
                           'foto': fotoLocal,
+                          'sexo': selectedValue,
                           'nivel': 'responsavel',
                         });
                         ScaffoldMessenger.of(context).clearSnackBars();
@@ -235,6 +264,7 @@ class _EditarResponsavelState extends State<EditarResponsavel> {
       celularControl.text = docRef['telefone'];
       cpfControl.text = docRef['cpf'];
       fotoLocal = docRef['foto'];
+      selectedValue = docRef['sexo'];
     });
   }
 }

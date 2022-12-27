@@ -30,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController croControl = TextEditingController();
   String adminEmail = '';
   String adminPass = '';
+  String selectedValue = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -117,6 +118,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   icon: Icons.person,
                                   label: 'Nome',
                                 ),
+                                DropdownButtonFormField(
+                                  elevation: 0,
+                                  dropdownColor: background,
+                                  borderRadius: BorderRadius.circular(20),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  items: [
+                                    DropdownMenuItem(
+                                      child: Text('Menino'),
+                                      value: 'Menino',
+                                    ),
+                                    DropdownMenuItem(
+                                      child: Text('Menina'),
+                                      value: 'Menina',
+                                    ),
+                                  ],
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      selectedValue = value!;
+                                    });
+                                  },
+                                  value: selectedValue,
+                                ),
+                                SizedBox(height: 15),
                                 CustomTextForm(
                                   controller: celularControl,
                                   icon: Icons.phone,
@@ -178,6 +206,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cpf': cpfControl.text,
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
+                                              'sexo': selectedValue,
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
@@ -250,16 +279,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cpf': cpfControl.text,
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
+                                              'sexo': selectedValue,
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
                                                 .clearSnackBars();
                                             ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                                    backgroundColor:
-                                                        Colors.green,
-                                                    content: Text(
-                                                        'Usuário: ${nomeControl.text} cadastrado com sucesso!')));
+                                                .showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.green,
+                                                content: Text(
+                                                    'Usuário: ${nomeControl.text} cadastrado com sucesso!'),
+                                              ),
+                                            );
                                             setState(() {
                                               nomeControl.clear();
                                               emailControl.clear();
@@ -344,6 +376,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   icon: Icons.person,
                                   label: 'Nome',
                                 ),
+                                DropdownButtonFormField(
+                                  elevation: 0,
+                                  dropdownColor: background,
+                                  borderRadius: BorderRadius.circular(20),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  items: [
+                                    DropdownMenuItem(
+                                      child: Text('Menino'),
+                                      value: 'Menino',
+                                    ),
+                                    DropdownMenuItem(
+                                      child: Text('Menina'),
+                                      value: 'Menina',
+                                    ),
+                                  ],
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      selectedValue = value!;
+                                    });
+                                  },
+                                  value: selectedValue,
+                                ),
+                                SizedBox(height: 15),
                                 CustomTextForm(
                                   controller: celularControl,
                                   icon: Icons.phone,
@@ -398,6 +457,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cpf': cpfControl.text,
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
+                                              'sexo': selectedValue,
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
@@ -469,6 +529,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'celular': celularControl.text,
                                               'cpf': cpfControl.text,
                                               'nivel': widget.tipo,
+                                              'sexo': selectedValue,
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
