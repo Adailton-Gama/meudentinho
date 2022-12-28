@@ -207,6 +207,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
                                               'sexo': selectedValue,
+                                              'foto':
+                                                  'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975',
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
@@ -280,6 +282,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
                                               'sexo': selectedValue,
+                                              'foto':
+                                                  'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975',
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
@@ -458,6 +462,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cro': croControl.text,
                                               'nivel': widget.tipo,
                                               'sexo': selectedValue,
+                                              'foto':
+                                                  'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975',
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)
@@ -530,6 +536,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               'cpf': cpfControl.text,
                                               'nivel': widget.tipo,
                                               'sexo': selectedValue,
+                                              'foto':
+                                                  'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975',
                                               'dtcadastro': Timestamp.now(),
                                             });
                                             ScaffoldMessenger.of(context)

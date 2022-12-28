@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +36,22 @@ class _TelaDentistaState extends State<TelaDentista> {
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection('Perfil');
   String sexo = 'Menino';
+  Timer? timer;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getData();
+    Future.delayed(Duration(seconds: 3)).then((value) => getData());
+    timer = Timer.periodic(Duration(seconds: 10), (timer) => getData());
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    timer!.cancel();
+    super.dispose();
+    print('Timer cancelado!');
   }
 
   String nome = 'Responsável';

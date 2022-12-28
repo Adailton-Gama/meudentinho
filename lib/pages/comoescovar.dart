@@ -21,8 +21,8 @@ class ComoEscovar extends StatefulWidget {
 final GlobalKey<ScaffoldState> _key = GlobalKey();
 
 class _ComoEscovarState extends State<ComoEscovar> {
-  VideoPlayerController controller =
-      VideoPlayerController.asset('assets/video/comoescovar.mp4');
+  VideoPlayerController controller = VideoPlayerController.network(
+      'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/comoescovar.mp4?alt=media&token=c632a5ce-40f3-4795-a09f-d61030b97c7d');
   String sexo = 'Menino';
   @override
   void initState() {

@@ -110,7 +110,6 @@ flutter:
     - assets/images/resetpass.png
     - assets/icon/icon.png
     - assets/icon/LOGO SOBERANA.png
-    - assets/video/comoescovar.mp4
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
