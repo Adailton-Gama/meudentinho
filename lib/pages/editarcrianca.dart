@@ -295,6 +295,7 @@ class _EditarDadosCriancaState extends State<EditarDadosCrianca> {
                                                   'senha': senhaControl.text,
                                                   'idade': idadeControl.text,
                                                   'cpf': cpfControl.text,
+                                                  'sexo': selectedValue,
                                                   'parentesco':
                                                       parentescoControl.text,
                                                   'foto': fotoLocal,

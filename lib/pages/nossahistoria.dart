@@ -315,8 +315,10 @@ class _NossaHistoriaState extends State<NossaHistoria> {
                     height: 100,
                     width: 100,
                     decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
-                            image: AssetImage('assets/icon/icon.png'))),
+                            image:
+                                AssetImage('assets/icon/LOGO SOBERANA.png'))),
                   ),
                   Text(
                     '''

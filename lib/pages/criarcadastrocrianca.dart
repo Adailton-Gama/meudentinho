@@ -44,6 +44,7 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
   String fotoLocal =
       'https://firebasestorage.googleapis.com/v0/b/meudentinho-57d84.appspot.com/o/add_foto.png?alt=media&token=a6cc94f0-bb00-4b2a-8b6d-655c679f1975';
   //
+  String selectedValue = 'Menino';
   @override
   void initState() {
     // TODO: implement initState
@@ -54,7 +55,6 @@ class _CriarContaCriancaState extends State<CriarContaCrianca> {
   Widget build(BuildContext context) {
     double cardWidth = Get.size.width * 0.9;
     double tamanhobarra = cardWidth - 20;
-    String selectedValue = 'Menino';
     var size = MediaQuery.of(context).size;
     var padBottom = MediaQuery.of(context).padding.bottom;
     var padTop = MediaQuery.of(context).padding.top;
